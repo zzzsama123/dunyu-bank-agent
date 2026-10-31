@@ -1,0 +1,297 @@
+[
+  {
+    "text": "钱都花哪了",
+    "name": "bill_analysis",
+    "slots": {
+      "range": "this_month"
+    }
+  },
+  {
+    "text": "这个月钱都花哪了",
+    "name": "bill_analysis",
+    "slots": {
+      "range": "this_month"
+    }
+  },
+  {
+    "text": "最近花钱有点多",
+    "name": "bill_analysis",
+    "slots": {
+      "range": "this_month"
+    }
+  },
+  {
+    "text": "帮我看看这个月账单",
+    "name": "bill_analysis",
+    "slots": {
+      "range": "this_month"
+    }
+  },
+  {
+    "text": "这个月花了多少",
+    "name": "bill_analysis",
+    "slots": {
+      "range": "this_month"
+    }
+  },
+  {
+    "text": "上个月花了多少",
+    "name": "bill_analysis",
+    "slots": {
+      "range": "last_month"
+    }
+  },
+  {
+    "text": "最近三个月的支出",
+    "name": "bill_analysis",
+    "slots": {
+      "range": "last_3m"
+    }
+  },
+  {
+    "text": "我最近有哪些消费",
+    "name": "bill_analysis",
+    "slots": {
+      "range": "last_30d",
+      "focus": "transactions"
+    }
+  },
+  {
+    "text": "查一下流水",
+    "name": "bill_analysis",
+    "slots": {
+      "focus": "transactions"
+    }
+  },
+  {
+    "text": "看看最近的交易记录",
+    "name": "bill_analysis",
+    "slots": {
+      "focus": "transactions"
+    }
+  },
+  {
+    "text": "这个月餐饮花了多少",
+    "name": "bill_analysis",
+    "slots": {
+      "range": "this_month",
+      "category": "餐饮"
+    }
+  },
+  {
+    "text": "打车花了多少",
+    "name": "bill_analysis",
+    "slots": {
+      "range": "this_month",
+      "category": "交通"
+    }
+  },
+  {
+    "text": "有没有乱扣费",
+    "name": "bill_analysis",
+    "slots": {
+      "focus": "anomaly"
+    }
+  },
+  {
+    "text": "最近有没有异常交易",
+    "name": "bill_analysis",
+    "slots": {
+      "focus": "anomaly"
+    }
+  },
+  {
+    "text": "这笔扣款是怎么回事",
+    "name": "bill_analysis",
+    "slots": {
+      "focus": "anomaly"
+    }
+  },
+  {
+    "text": "这个会员我不想用了",
+    "name": "subscription",
+    "slots": {
+      "action": "cancel"
+    }
+  },
+  {
+    "text": "帮我把会员退了",
+    "name": "subscription",
+    "slots": {
+      "action": "cancel"
+    }
+  },
+  {
+    "text": "会员太多了",
+    "name": "subscription",
+    "slots": {
+      "action": "detail"
+    }
+  },
+  {
+    "text": "我开了哪些会员",
+    "name": "subscription",
+    "slots": {
+      "action": "detail"
+    }
+  },
+  {
+    "text": "每个月订阅花多少钱",
+    "name": "subscription",
+    "slots": {
+      "action": "detail"
+    }
+  },
+  {
+    "text": "这个自动扣费能关吗",
+    "name": "subscription",
+    "slots": {
+      "action": "cancel"
+    }
+  },
+  {
+    "text": "卡不能用了",
+    "name": "card",
+    "slots": {
+      "action": "lost"
+    }
+  },
+  {
+    "text": "我卡丢了怎么办",
+    "name": "card",
+    "slots": {
+      "action": "lost"
+    }
+  },
+  {
+    "text": "帮我补一张卡",
+    "name": "card",
+    "slots": {
+      "action": "lost"
+    }
+  },
+  {
+    "text": "额度太低了",
+    "name": "card",
+    "slots": {
+      "action": "limit"
+    }
+  },
+  {
+    "text": "把额度调高一点",
+    "name": "card",
+    "slots": {
+      "action": "limit"
+    }
+  },
+  {
+    "text": "解挂我的卡",
+    "name": "card",
+    "slots": {
+      "action": "unlock"
+    }
+  },
+  {
+    "text": "申请一张虚拟卡",
+    "name": "card",
+    "slots": {
+      "action": "apply"
+    }
+  },
+  {
+    "text": "有什么理财",
+    "name": "wealth",
+    "slots": {
+      "action": "list"
+    }
+  },
+  {
+    "text": "推荐个理财产品",
+    "name": "wealth",
+    "slots": {
+      "action": "list"
+    }
+  },
+  {
+    "text": "我的理财收益怎么样",
+    "name": "wealth",
+    "slots": {
+      "action": "holdings"
+    }
+  },
+  {
+    "text": "帮我看看持仓",
+    "name": "wealth",
+    "slots": {
+      "action": "holdings"
+    }
+  },
+  {
+    "text": "赎回理财",
+    "name": "wealth",
+    "slots": {
+      "action": "redeem"
+    }
+  },
+  {
+    "text": "给老妈转500",
+    "name": "transfer",
+    "slots": {
+      "payee": "妈",
+      "amount": 50000
+    }
+  },
+  {
+    "text": "给张三转100",
+    "name": "transfer",
+    "slots": {
+      "payee": "张三",
+      "amount": 10000
+    }
+  },
+  {
+    "text": "给房东转3000房租",
+    "name": "transfer",
+    "slots": {
+      "payee": "房东",
+      "amount": 300000,
+      "memo": "房租"
+    }
+  },
+  {
+    "text": "给老婆转2000",
+    "name": "transfer",
+    "slots": {
+      "payee": "老婆",
+      "amount": 200000
+    }
+  },
+  {
+    "text": "提醒我一下",
+    "name": "standing_plan",
+    "slots": {
+      "goal": "提醒"
+    }
+  },
+  {
+    "text": "到时候提醒我",
+    "name": "standing_plan",
+    "slots": {
+      "goal": "提醒"
+    }
+  },
+  {
+    "text": "别忘了提醒我",
+    "name": "standing_plan",
+    "slots": {
+      "goal": "提醒"
+    }
+  },
+  {
+    "text": "这个月花超了吗",
+    "name": "bill_analysis",
+    "slots": {
+      "range": "this_month"
+    }
+  }
+]

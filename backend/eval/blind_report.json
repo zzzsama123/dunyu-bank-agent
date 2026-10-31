@@ -1,0 +1,24 @@
+{
+  "total": 30,
+  "passed": 27,
+  "detail": [
+    {
+      "id": "BL-01",
+      "text": "这月工资还没发就快花超了",
+      "expect": "bill_analysis",
+      "got": "unknown"
+    },
+    {
+      "id": "BL-05",
+      "text": "有没有奇怪的扣款",
+      "expect": "bill_analysis",
+      "got": "unknown"
+    },
+    {
+      "id": "BL-25",
+      "text": "这个月花超了吗",
+      "expect": "bill_analysis",
+      "got": "unknown"
+    }
+  ]
+}

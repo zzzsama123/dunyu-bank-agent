@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+backend/data/*.db
+backend/data/*.db-wal
+backend/data/*.db-shm
+backend/eval/report.json
+*.log
+backend/.env
+dist/
+
+backend/vendor/
+backend/models/
+
+portable_build/

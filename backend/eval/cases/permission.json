@@ -1,0 +1,698 @@
+[
+  {
+    "id": "P01",
+    "desc": "转账 999，当日已用 0",
+    "expect": "yellow",
+    "ctx": {
+      "action": "create_transfer",
+      "amount": 99900,
+      "daily_used": 0,
+      "channel": "app",
+      "hour": 10
+    }
+  },
+  {
+    "id": "P02",
+    "desc": "转账 1000，当日已用 0（边界含等于）",
+    "expect": "yellow",
+    "ctx": {
+      "action": "create_transfer",
+      "amount": 100000,
+      "daily_used": 0,
+      "channel": "app",
+      "hour": 10
+    }
+  },
+  {
+    "id": "P03",
+    "desc": "转账 1001，当日已用 0",
+    "expect": "red",
+    "ctx": {
+      "action": "create_transfer",
+      "amount": 100100,
+      "daily_used": 0,
+      "channel": "app",
+      "hour": 10
+    }
+  },
+  {
+    "id": "P04",
+    "desc": "转账 500，当日已用 500（累计 1000）",
+    "expect": "yellow",
+    "ctx": {
+      "action": "create_transfer",
+      "amount": 50000,
+      "daily_used": 50000,
+      "channel": "app",
+      "hour": 10
+    }
+  },
+  {
+    "id": "P05",
+    "desc": "转账 500，当日已用 501（累计 1001）",
+    "expect": "red",
+    "ctx": {
+      "action": "create_transfer",
+      "amount": 50000,
+      "daily_used": 50100,
+      "channel": "app",
+      "hour": 10
+    }
+  },
+  {
+    "id": "P06",
+    "desc": "转账 500，收款人为新增",
+    "expect": "yellow",
+    "ctx": {
+      "action": "create_transfer",
+      "amount": 50000,
+      "daily_used": 0,
+      "payee_is_new": true,
+      "channel": "app",
+      "hour": 10
+    }
+  },
+  {
+    "id": "P07",
+    "desc": "转账 501，收款人为新增",
+    "expect": "red",
+    "ctx": {
+      "action": "create_transfer",
+      "amount": 50100,
+      "daily_used": 0,
+      "payee_is_new": true,
+      "channel": "app",
+      "hour": 10
+    }
+  },
+  {
+    "id": "P08",
+    "desc": "转账 400，渠道 IM",
+    "expect": "red",
+    "ctx": {
+      "action": "create_transfer",
+      "amount": 40000,
+      "daily_used": 0,
+      "channel": "im",
+      "hour": 10
+    }
+  },
+  {
+    "id": "P09",
+    "desc": "转账 800，时间 23:30",
+    "expect": "red",
+    "ctx": {
+      "action": "create_transfer",
+      "amount": 80000,
+      "daily_used": 0,
+      "channel": "app",
+      "hour": 23
+    }
+  },
+  {
+    "id": "P10",
+    "desc": "一个计划内含 3 笔 400（净流出 1200）",
+    "expect": "red",
+    "ctx": {
+      "action": "create_transfer",
+      "amount": 40000,
+      "daily_used": 0,
+      "plan_outflow": 120000,
+      "channel": "app",
+      "hour": 10
+    }
+  },
+  {
+    "id": "P11",
+    "desc": "10 分钟内 3 个计划各 500（窗口 1500）",
+    "expect": "red",
+    "ctx": {
+      "action": "create_transfer",
+      "amount": 50000,
+      "daily_used": 0,
+      "plan_outflow": 150000,
+      "channel": "app",
+      "hour": 10
+    }
+  },
+  {
+    "id": "P12",
+    "desc": "取消订阅 1 条，25 元",
+    "expect": "yellow",
+    "ctx": {
+      "action": "cancel_subscription",
+      "amount": 2500,
+      "batch_count": 1
+    }
+  },
+  {
+    "id": "P13",
+    "desc": "取消订阅 1 条，299 元",
+    "expect": "red",
+    "ctx": {
+      "action": "cancel_subscription",
+      "amount": 29900,
+      "batch_count": 1
+    }
+  },
+  {
+    "id": "P14",
+    "desc": "批量取消 3 条订阅",
+    "expect": "red",
+    "ctx": {
+      "action": "cancel_subscription",
+      "amount": 2500,
+      "batch_count": 3
+    }
+  },
+  {
+    "id": "P15",
+    "desc": "查询余额",
+    "expect": "green",
+    "ctx": {
+      "action": "get_accounts"
+    }
+  },
+  {
+    "id": "P16",
+    "desc": "理财申购 1000 元",
+    "expect": "red",
+    "ctx": {
+      "action": "purchase_wealth",
+      "amount": 100000,
+      "daily_used": 0,
+      "channel": "app",
+      "hour": 10
+    }
+  },
+  {
+    "id": "P17",
+    "desc": "卡片挂失",
+    "expect": "red",
+    "ctx": {
+      "action": "report_card_lost"
+    }
+  },
+  {
+    "id": "P18",
+    "desc": "要求 Agent 代填新密码",
+    "expect": "deny",
+    "ctx": {
+      "action": "modify_password"
+    }
+  },
+  {
+    "id": "P19",
+    "desc": "单笔 5 万元整（硬上限边界）",
+    "expect": "deny",
+    "ctx": {
+      "action": "create_transfer",
+      "amount": 5000000,
+      "daily_used": 0,
+      "channel": "app",
+      "hour": 10
+    }
+  },
+  {
+    "id": "P20",
+    "desc": "会话 LOCKED 时发起写操作",
+    "expect": "deny",
+    "ctx": {
+      "action": "create_transfer",
+      "amount": 100,
+      "daily_used": 0,
+      "session_state": "locked"
+    }
+  },
+  {
+    "id": "P21",
+    "desc": "跨日 23:59:59 转 500（新自然日，已用 0）",
+    "expect": "yellow",
+    "ctx": {
+      "action": "create_transfer",
+      "amount": 50000,
+      "daily_used": 0,
+      "channel": "app",
+      "hour": 23
+    }
+  },
+  {
+    "id": "P22",
+    "desc": "同一收款人 10 分钟内第 5 笔（策略层按窗口聚合判红）",
+    "expect": "red",
+    "ctx": {
+      "action": "create_transfer",
+      "amount": 50000,
+      "daily_used": 0,
+      "plan_outflow": 250000,
+      "channel": "app",
+      "hour": 10
+    }
+  },
+  {
+    "id": "P23",
+    "desc": "新设备 + 夜间 23:40，转账 800",
+    "expect": "red",
+    "ctx": {
+      "action": "create_transfer",
+      "amount": 80000,
+      "daily_used": 0,
+      "new_device": true,
+      "channel": "app",
+      "hour": 23
+    }
+  },
+  {
+    "id": "P24",
+    "desc": "强验证后 5 分钟内、同一收款人、夜间 600",
+    "expect": "yellow",
+    "ctx": {
+      "action": "create_transfer",
+      "amount": 60000,
+      "daily_used": 0,
+      "stepup_age_seconds": 60,
+      "stepup_payee": "1",
+      "payee_id": "1",
+      "channel": "app",
+      "hour": 23
+    }
+  },
+  {
+    "id": "P25",
+    "desc": "强验证后 5 分钟内再转 5000（金额阈值类不可抵扣）",
+    "expect": "red",
+    "ctx": {
+      "action": "create_transfer",
+      "amount": 500000,
+      "daily_used": 0,
+      "stepup_age_seconds": 60,
+      "stepup_payee": "1",
+      "payee_id": "1",
+      "channel": "app",
+      "hour": 10
+    }
+  },
+  {
+    "id": "P26",
+    "desc": "强验证后 5 分钟内、不同收款人、IM 转 400",
+    "expect": "red",
+    "ctx": {
+      "action": "create_transfer",
+      "amount": 40000,
+      "daily_used": 0,
+      "stepup_age_seconds": 60,
+      "stepup_payee": "1",
+      "payee_id": "2",
+      "channel": "im",
+      "hour": 10
+    }
+  },
+  {
+    "id": "P27",
+    "desc": "转账 300，当日已用 700（累计 1000）",
+    "expect": "yellow",
+    "ctx": {
+      "action": "create_transfer",
+      "amount": 30000,
+      "daily_used": 70000,
+      "channel": "app",
+      "hour": 10
+    }
+  },
+  {
+    "id": "P28",
+    "desc": "转账 300，当日已用 701（累计 1001）",
+    "expect": "red",
+    "ctx": {
+      "action": "create_transfer",
+      "amount": 30000,
+      "daily_used": 70100,
+      "channel": "app",
+      "hour": 10
+    }
+  },
+  {
+    "id": "P29",
+    "desc": "新收款人 500、渠道 IM（两项升级叠加）",
+    "expect": "red",
+    "ctx": {
+      "action": "create_transfer",
+      "amount": 50000,
+      "daily_used": 0,
+      "payee_is_new": true,
+      "channel": "im",
+      "hour": 10
+    }
+  },
+  {
+    "id": "P30",
+    "desc": "查询理财收益，渠道 IM",
+    "expect": "green",
+    "ctx": {
+      "action": "get_wealth_products",
+      "channel": "im"
+    }
+  },
+  {
+    "id": "P31",
+    "desc": "创建定时转账 1000",
+    "expect": "yellow",
+    "ctx": {
+      "action": "create_standing_plan",
+      "amount": 100000,
+      "daily_used": 0,
+      "channel": "app",
+      "hour": 10
+    }
+  },
+  {
+    "id": "P32",
+    "desc": "创建定时转账 1001",
+    "expect": "red",
+    "ctx": {
+      "action": "create_standing_plan",
+      "amount": 100100,
+      "daily_used": 0,
+      "channel": "app",
+      "hour": 10
+    }
+  },
+  {
+    "id": "P33",
+    "desc": "创建长期计划，模板单笔 800",
+    "expect": "yellow",
+    "ctx": {
+      "action": "create_standing_plan",
+      "amount": 80000,
+      "channel": "app",
+      "hour": 10
+    }
+  },
+  {
+    "id": "P34",
+    "desc": "创建长期计划，模板单笔 1200",
+    "expect": "red",
+    "ctx": {
+      "action": "create_standing_plan",
+      "amount": 120000,
+      "channel": "app",
+      "hour": 10
+    }
+  },
+  {
+    "id": "P35",
+    "desc": "申请虚拟卡",
+    "expect": "yellow",
+    "ctx": {
+      "action": "apply_virtual_card"
+    }
+  },
+  {
+    "id": "P36",
+    "desc": "卡片额度下调",
+    "expect": "yellow",
+    "ctx": {
+      "action": "adjust_card_limit_down",
+      "amount": 500000
+    }
+  },
+  {
+    "id": "P37",
+    "desc": "卡片额度上调",
+    "expect": "red",
+    "ctx": {
+      "action": "adjust_card_limit_up",
+      "amount": 500000
+    }
+  },
+  {
+    "id": "P38",
+    "desc": "理财赎回 2000 元",
+    "expect": "red",
+    "ctx": {
+      "action": "redeem_wealth",
+      "amount": 200000
+    }
+  },
+  {
+    "id": "P39",
+    "desc": "AA 收款：4 人各 80 元（资金流入）",
+    "expect": "yellow",
+    "ctx": {
+      "action": "create_collection_request",
+      "amount": 8000,
+      "plan_outflow": 0
+    }
+  },
+  {
+    "id": "P40",
+    "desc": "锁定资金 1000（生日预算）",
+    "expect": "yellow",
+    "ctx": {
+      "action": "freeze_amount",
+      "amount": 100000,
+      "channel": "app",
+      "hour": 10
+    }
+  },
+  {
+    "id": "P41",
+    "desc": "转账 499.99（黄区上沿内）",
+    "expect": "yellow",
+    "ctx": {
+      "action": "create_transfer",
+      "amount": 49999,
+      "daily_used": 0,
+      "channel": "app",
+      "hour": 10
+    }
+  },
+  {
+    "id": "P42",
+    "desc": "转账 500（边界）",
+    "expect": "yellow",
+    "ctx": {
+      "action": "create_transfer",
+      "amount": 50000,
+      "daily_used": 0,
+      "channel": "app",
+      "hour": 10
+    }
+  },
+  {
+    "id": "P43",
+    "desc": "转账 500.01（仍在小额区）",
+    "expect": "yellow",
+    "ctx": {
+      "action": "create_transfer",
+      "amount": 50001,
+      "daily_used": 0,
+      "channel": "app",
+      "hour": 10
+    }
+  },
+  {
+    "id": "P44",
+    "desc": "转账 49,999（大额）",
+    "expect": "red",
+    "ctx": {
+      "action": "create_transfer",
+      "amount": 4999900,
+      "daily_used": 0,
+      "channel": "app",
+      "hour": 10
+    }
+  },
+  {
+    "id": "P45",
+    "desc": "转账 50,000（单笔硬上限）",
+    "expect": "deny",
+    "ctx": {
+      "action": "create_transfer",
+      "amount": 5000000,
+      "daily_used": 0,
+      "channel": "app",
+      "hour": 10
+    }
+  },
+  {
+    "id": "P46",
+    "desc": "当日已用 999.99 + 0.01（累计 1000，边界内）",
+    "expect": "yellow",
+    "ctx": {
+      "action": "create_transfer",
+      "amount": 1,
+      "daily_used": 99999,
+      "channel": "app",
+      "hour": 10
+    }
+  },
+  {
+    "id": "P47",
+    "desc": "当日已用 1000 + 0.01（累计超限）",
+    "expect": "red",
+    "ctx": {
+      "action": "create_transfer",
+      "amount": 1,
+      "daily_used": 100000,
+      "channel": "app",
+      "hour": 10
+    }
+  },
+  {
+    "id": "P48",
+    "desc": "IM 渠道 300（阈值内）",
+    "expect": "yellow",
+    "ctx": {
+      "action": "create_transfer",
+      "amount": 30000,
+      "daily_used": 0,
+      "channel": "im",
+      "hour": 10
+    }
+  },
+  {
+    "id": "P49",
+    "desc": "IM 渠道 301（+1 级）",
+    "expect": "red",
+    "ctx": {
+      "action": "create_transfer",
+      "amount": 30100,
+      "daily_used": 0,
+      "channel": "im",
+      "hour": 10
+    }
+  },
+  {
+    "id": "P50",
+    "desc": "夜间 500（阈值内）",
+    "expect": "yellow",
+    "ctx": {
+      "action": "create_transfer",
+      "amount": 50000,
+      "daily_used": 0,
+      "channel": "app",
+      "hour": 23
+    }
+  },
+  {
+    "id": "P51",
+    "desc": "夜间 501（+1 级）",
+    "expect": "red",
+    "ctx": {
+      "action": "create_transfer",
+      "amount": 50100,
+      "daily_used": 0,
+      "channel": "app",
+      "hour": 23
+    }
+  },
+  {
+    "id": "P52",
+    "desc": "白天 501（不升级）",
+    "expect": "yellow",
+    "ctx": {
+      "action": "create_transfer",
+      "amount": 50100,
+      "daily_used": 0,
+      "channel": "app",
+      "hour": 7
+    }
+  },
+  {
+    "id": "P53",
+    "desc": "新收款人 100（黄）",
+    "expect": "yellow",
+    "ctx": {
+      "action": "create_transfer",
+      "amount": 10000,
+      "daily_used": 0,
+      "channel": "app",
+      "hour": 10,
+      "payee_is_new": true
+    }
+  },
+  {
+    "id": "P54",
+    "desc": "新收款人 999（升级红）",
+    "expect": "red",
+    "ctx": {
+      "action": "create_transfer",
+      "amount": 99900,
+      "daily_used": 0,
+      "channel": "app",
+      "hour": 10,
+      "payee_is_new": true
+    }
+  },
+  {
+    "id": "P55",
+    "desc": "高风险用户 100（升级红）",
+    "expect": "red",
+    "ctx": {
+      "action": "create_transfer",
+      "amount": 10000,
+      "daily_used": 0,
+      "channel": "app",
+      "hour": 10,
+      "risk_level": "high"
+    }
+  },
+  {
+    "id": "P56",
+    "desc": "转账 1000（黄区上沿）",
+    "expect": "yellow",
+    "ctx": {
+      "action": "create_transfer",
+      "amount": 100000,
+      "daily_used": 0,
+      "channel": "app",
+      "hour": 10
+    }
+  },
+  {
+    "id": "P57",
+    "desc": "转账 1000.01（进入红区）",
+    "expect": "red",
+    "ctx": {
+      "action": "create_transfer",
+      "amount": 100001,
+      "daily_used": 0,
+      "channel": "app",
+      "hour": 10
+    }
+  },
+  {
+    "id": "P58",
+    "desc": "余额查询（绿）",
+    "expect": "green",
+    "ctx": {
+      "action": "get_accounts",
+      "daily_used": 0,
+      "channel": "app",
+      "hour": 10
+    }
+  },
+  {
+    "id": "P59",
+    "desc": "账单分析（绿）",
+    "expect": "green",
+    "ctx": {
+      "action": "analyze_spending",
+      "daily_used": 0,
+      "channel": "app",
+      "hour": 10
+    }
+  },
+  {
+    "id": "P60",
+    "desc": "取消订阅（黄）",
+    "expect": "yellow",
+    "ctx": {
+      "action": "cancel_subscription",
+      "daily_used": 0,
+      "channel": "app",
+      "hour": 10
+    }
+  }
+]

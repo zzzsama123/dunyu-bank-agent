@@ -1,0 +1,346 @@
+[
+  {
+    "text": "转500给我妈",
+    "expect": "transfer"
+  },
+  {
+    "text": "给我妈转500",
+    "expect": "transfer"
+  },
+  {
+    "text": "给张三转100块",
+    "expect": "transfer"
+  },
+  {
+    "text": "转 1,200 给房东",
+    "expect": "transfer"
+  },
+  {
+    "text": "打5000给老婆",
+    "expect": "transfer"
+  },
+  {
+    "text": "给李娜转三百",
+    "expect": "transfer"
+  },
+  {
+    "text": "帮我转点钱给我妈",
+    "expect": "transfer"
+  },
+  {
+    "text": "AA一下，人均80",
+    "expect": "transfer"
+  },
+  {
+    "text": "中午吃饭320，四个人AA",
+    "expect": "transfer"
+  },
+  {
+    "text": "再给我妈转800",
+    "expect": "transfer"
+  },
+  {
+    "text": "我这个月钱都去哪了",
+    "expect": "bill_analysis"
+  },
+  {
+    "text": "上个月花了多少",
+    "expect": "bill_analysis"
+  },
+  {
+    "text": "今年支出统计",
+    "expect": "bill_analysis"
+  },
+  {
+    "text": "看看我的消费情况",
+    "expect": "bill_analysis"
+  },
+  {
+    "text": "钱都花哪了",
+    "expect": "bill_analysis"
+  },
+  {
+    "text": "生成一份月报",
+    "expect": "bill_analysis"
+  },
+  {
+    "text": "有没有异常交易",
+    "expect": "bill_analysis"
+  },
+  {
+    "text": "最近花钱有点多",
+    "expect": "bill_analysis"
+  },
+  {
+    "text": "本月账单给我看看",
+    "expect": "bill_analysis"
+  },
+  {
+    "text": "年度账单",
+    "expect": "bill_analysis"
+  },
+  {
+    "text": "我都被扣了什么会员",
+    "expect": "subscription"
+  },
+  {
+    "text": "有哪些自动续费",
+    "expect": "subscription"
+  },
+  {
+    "text": "帮我取消视频会员A",
+    "expect": "subscription"
+  },
+  {
+    "text": "订阅管理",
+    "expect": "subscription"
+  },
+  {
+    "text": "这个会员我不想用了",
+    "expect": "subscription"
+  },
+  {
+    "text": "查一下代扣",
+    "expect": "subscription"
+  },
+  {
+    "text": "我的订阅有哪些",
+    "expect": "subscription"
+  },
+  {
+    "text": "下次扣费前提醒我",
+    "expect": "subscription",
+    "expect_any": [
+      "subscription",
+      "standing_plan"
+    ]
+  },
+  {
+    "text": "把没用的都退了",
+    "expect": "subscription"
+  },
+  {
+    "text": "自动扣费项目",
+    "expect": "subscription"
+  },
+  {
+    "text": "有什么稳一点的理财",
+    "expect": "wealth"
+  },
+  {
+    "text": "理财产品推荐",
+    "expect": "wealth"
+  },
+  {
+    "text": "我的持仓收益",
+    "expect": "wealth"
+  },
+  {
+    "text": "买5000那个",
+    "expect": "wealth"
+  },
+  {
+    "text": "赎回理财",
+    "expect": "wealth"
+  },
+  {
+    "text": "理财收益怎么样",
+    "expect": "wealth"
+  },
+  {
+    "text": "风险等级低的基金",
+    "expect": "wealth"
+  },
+  {
+    "text": "看看理财产品",
+    "expect": "wealth"
+  },
+  {
+    "text": "申购1000稳盈90天",
+    "expect": "wealth"
+  },
+  {
+    "text": "最近收益如何",
+    "expect": "wealth"
+  },
+  {
+    "text": "我卡丢了",
+    "expect": "card"
+  },
+  {
+    "text": "挂失信用卡",
+    "expect": "card"
+  },
+  {
+    "text": "我的额度多少",
+    "expect": "card"
+  },
+  {
+    "text": "额度调低一点",
+    "expect": "card"
+  },
+  {
+    "text": "解挂",
+    "expect": "card"
+  },
+  {
+    "text": "申请一张虚拟卡",
+    "expect": "card"
+  },
+  {
+    "text": "卡片状态怎么样",
+    "expect": "card"
+  },
+  {
+    "text": "我的卡有哪些",
+    "expect": "card"
+  },
+  {
+    "text": "交易限额设置",
+    "expect": "card"
+  },
+  {
+    "text": "补办卡要多久",
+    "expect": "card"
+  },
+  {
+    "text": "我老婆下个月生日帮我准备一下",
+    "expect": "standing_plan"
+  },
+  {
+    "text": "生日前提醒我",
+    "expect": "standing_plan"
+  },
+  {
+    "text": "下个月提醒我交房租",
+    "expect": "standing_plan"
+  },
+  {
+    "text": "帮我安排纪念日",
+    "expect": "standing_plan"
+  },
+  {
+    "text": "设置一个长期计划",
+    "expect": "standing_plan"
+  },
+  {
+    "text": "每月1号给房东转2500",
+    "expect": "standing_plan",
+    "expect_any": [
+      "standing_plan",
+      "transfer"
+    ]
+  },
+  {
+    "text": "提前两天提醒我",
+    "expect": "standing_plan"
+  },
+  {
+    "text": "老婆生日准备礼物",
+    "expect": "standing_plan"
+  },
+  {
+    "text": "安排一下下个月的事",
+    "expect": "standing_plan"
+  },
+  {
+    "text": "定个提醒",
+    "expect": "standing_plan"
+  },
+  {
+    "text": "帮我瞅瞅这个月钱都花哪了",
+    "expect": "bill_analysis"
+  },
+  {
+    "text": "这个月花了多少",
+    "expect": "bill_analysis"
+  },
+  {
+    "text": "上个月帐单给我看一下",
+    "expect": "bill_analysis"
+  },
+  {
+    "text": "我最近钱都去哪了",
+    "expect": "bill_analysis"
+  },
+  {
+    "text": "查查我妈给我的钱",
+    "expect": "bill_analysis"
+  },
+  {
+    "text": "我妈这个月转给我多少",
+    "expect": "bill_analysis"
+  },
+  {
+    "text": "退掉那个视频会员",
+    "expect": "subscription"
+  },
+  {
+    "text": "把不用的会员停了吧",
+    "expect": "subscription"
+  },
+  {
+    "text": "我卡挂失了",
+    "expect": "card"
+  },
+  {
+    "text": "卡片解挂",
+    "expect": "card"
+  },
+  {
+    "text": "给我妈转 五百二",
+    "expect": "transfer"
+  },
+  {
+    "text": "转一千二给我妈",
+    "expect": "transfer"
+  },
+  {
+    "text": "给张三打 100 块",
+    "expect": "transfer"
+  },
+  {
+    "text": "我老婆下个月生日，预算 1200",
+    "expect": "standing_plan"
+  },
+  {
+    "text": "老妈生日帮我准备一下",
+    "expect": "standing_plan"
+  },
+  {
+    "text": "把上个月理财收益算一下",
+    "expect": "wealth"
+  },
+  {
+    "text": "我买的那只基金赚了多少",
+    "expect": "wealth"
+  },
+  {
+    "text": "查下我上个月的餐饮消费",
+    "expect": "bill_analysis"
+  },
+  {
+    "text": "这个月购物花了多少",
+    "expect": "bill_analysis"
+  },
+  {
+    "text": "我最近有没有乱扣费",
+    "expect": "bill_analysis"
+  },
+  {
+    "text": "帮我把那个自动续费关了",
+    "expect": "subscription"
+  },
+  {
+    "text": "查一下我上周的流水",
+    "expect": "bill_analysis"
+  },
+  {
+    "text": "我的信用卡额度多少",
+    "expect": "card"
+  },
+  {
+    "text": "给我妈转两千",
+    "expect": "transfer"
+  }
+]

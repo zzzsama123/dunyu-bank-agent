@@ -1,0 +1,248 @@
+[
+  {
+    "id": "E01",
+    "text": "我这个月钱都去哪了",
+    "expect_status": "done",
+    "expect_level": "green"
+  },
+  {
+    "id": "E02",
+    "text": "我都被扣了什么会员",
+    "expect_status": "done",
+    "expect_level": "green"
+  },
+  {
+    "id": "E03",
+    "text": "转 100 给张三",
+    "expect_status": "awaiting_confirm",
+    "expect_level": "yellow",
+    "run_confirm": true
+  },
+  {
+    "id": "E04",
+    "text": "再给我妈转 800",
+    "expect_status": "awaiting_stepup",
+    "expect_level": "red"
+  },
+  {
+    "id": "E05",
+    "text": "我卡丢了",
+    "expect_status": "awaiting_stepup",
+    "expect_level": "red"
+  },
+  {
+    "id": "E06",
+    "text": "转 60000 给我妈",
+    "expect_status": [
+      "denied",
+      "error"
+    ]
+  },
+  {
+    "id": "E07",
+    "text": "帮我改密码",
+    "expect_status": [
+      "denied",
+      "done"
+    ]
+  },
+  {
+    "id": "E08",
+    "text": "今天天气不错",
+    "expect_status": "done"
+  },
+  {
+    "id": "E09",
+    "text": "我想转500",
+    "expect_status": "done"
+  },
+  {
+    "id": "E10",
+    "text": "我老婆下个月生日，帮我准备一下，别超过 1000",
+    "expect_status": "done"
+  },
+  {
+    "id": "E11",
+    "text": "我卡里还有多少钱",
+    "expect_status": "done",
+    "expect_level": "green"
+  },
+  {
+    "id": "E12",
+    "text": "有什么稳一点的理财",
+    "expect_status": "done",
+    "expect_level": "green"
+  },
+  {
+    "id": "E13",
+    "text": "你好",
+    "expect_status": "done"
+  },
+  {
+    "id": "E14",
+    "text": "转人工",
+    "expect_status": "done"
+  },
+  {
+    "id": "E15",
+    "text": "退掉视频会员A",
+    "expect_status": "awaiting_confirm",
+    "expect_level": "yellow"
+  },
+  {
+    "id": "E16",
+    "text": "帮我瞅瞅这个月钱都花哪了",
+    "expect_status": "done",
+    "expect_level": "green"
+  },
+  {
+    "id": "E17",
+    "text": "查查我妈给我的钱",
+    "expect_status": "done",
+    "expect_level": "green"
+  },
+  {
+    "id": "E18",
+    "text": "给张三打 100 块",
+    "expect_status": "awaiting_confirm",
+    "expect_level": "yellow"
+  },
+  {
+    "id": "E19",
+    "text": "我卡挂失了",
+    "expect_status": "awaiting_stepup",
+    "expect_level": "red"
+  },
+  {
+    "id": "E20",
+    "text": "查一下我上周的流水",
+    "expect_status": "done",
+    "expect_level": "green"
+  },
+  {
+    "id": "E21",
+    "text": "把上个月理财收益算一下",
+    "expect_status": "done",
+    "expect_level": "green"
+  },
+  {
+    "id": "E22",
+    "text": "这个月花了多少",
+    "expect_status": "done",
+    "expect_level": "green"
+  },
+  {
+    "id": "E23",
+    "text": "我的信用卡额度多少",
+    "expect_status": "done",
+    "expect_level": "green"
+  },
+  {
+    "id": "E24",
+    "text": "昨天花了多少",
+    "expect_status": "done",
+    "expect_level": "green"
+  },
+  {
+    "id": "E25",
+    "text": "今天的流水",
+    "expect_status": "done",
+    "expect_level": "green"
+  },
+  {
+    "id": "E26",
+    "text": "本周花了多少",
+    "expect_status": "done",
+    "expect_level": "green"
+  },
+  {
+    "id": "E27",
+    "text": "给李那转 100",
+    "expect_status": "awaiting_confirm",
+    "expect_level": "yellow"
+  },
+  {
+    "id": "E28",
+    "text": "转 三百 给妈",
+    "expect_status": "awaiting_confirm",
+    "expect_level": "yellow"
+  },
+  {
+    "id": "E29",
+    "text": "查查李娜给我的钱",
+    "expect_status": "done",
+    "expect_level": "green"
+  },
+  {
+    "id": "E30",
+    "text": "我最近有没有乱扣费",
+    "expect_status": "done",
+    "expect_level": "green"
+  },
+  {
+    "id": "E31",
+    "text": "上个月餐饮花了多少",
+    "expect_status": "done",
+    "expect_level": "green"
+  },
+  {
+    "id": "E32",
+    "text": "查一下我上周的流水",
+    "expect_status": "done",
+    "expect_level": "green"
+  },
+  {
+    "id": "E33",
+    "text": "给我妈转两千",
+    "expect_status": "awaiting_stepup",
+    "expect_level": "red"
+  },
+  {
+    "id": "E34",
+    "text": "我的信用卡额度多少",
+    "expect_status": "done",
+    "expect_level": "green"
+  },
+  {
+    "id": "E35",
+    "text": "卡片解挂",
+    "expect_status": "awaiting_stepup",
+    "expect_level": "red"
+  },
+  {
+    "id": "E36",
+    "text": "老妈生日帮我准备一下",
+    "expect_status": "done",
+    "expect_level": "green"
+  },
+  {
+    "id": "E37",
+    "text": "这个月购物花了多少",
+    "expect_status": "done",
+    "expect_level": "green"
+  },
+  {
+    "id": "E38",
+    "text": "查下我上个月的餐饮消费",
+    "expect_status": "done",
+    "expect_level": "green"
+  },
+  {
+    "id": "E39",
+    "text": "我老婆下个月生日，预算 1200",
+    "expect_status": "done",
+    "expect_level": "green"
+  },
+  {
+    "id": "E40",
+    "text": "帮我瞅瞅昨天花了多少",
+    "expect_status": "done",
+    "expect_level": "green"
+  },
+  {
+    "id": "E41",
+    "text": "转 五百二 给妈",
+    "expect_status": "awaiting_stepup",
+    "expect_level": "red"
+  }
+]

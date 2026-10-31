@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "backend": "native",
+  "rasterEngine": "libreoffice",
+  "source": "saved",
+  "inputPath": "D:\\银行agent项目\\bankagent\\deliverables\\盾语_技术文档.docx",
+  "sourceSha256": "1e9b043db3ab5ff65d1c2aa63a97d1d98cc9e9650bc02733ff0d2613461a6d9e",
+  "dpi": 144,
+  "pageCount": 5,
+  "images": [
+    {
+      "index": 1,
+      "page": 1,
+      "path": "D:\\银行agent项目\\bankagent\\.dsh-office-6b221086888448ddbfb037505026cdb5\\tech\\page-0001.png",
+      "width": 1191,
+      "height": 1684,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 793.7333333333333,
+        "height": 1122.5333333333333
+      },
+      "byteLength": 57743
+    },
+    {
+      "index": 2,
+      "page": 2,
+      "path": "D:\\银行agent项目\\bankagent\\.dsh-office-6b221086888448ddbfb037505026cdb5\\tech\\page-0002.png",
+      "width": 1191,
+      "height": 1684,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 793.7333333333333,
+        "height": 1122.5333333333333
+      },
+      "byteLength": 171146
+    },
+    {
+      "index": 3,
+      "page": 3,
+      "path": "D:\\银行agent项目\\bankagent\\.dsh-office-6b221086888448ddbfb037505026cdb5\\tech\\page-0003.png",
+      "width": 1191,
+      "height": 1684,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 793.7333333333333,
+        "height": 1122.5333333333333
+      },
+      "byteLength": 153146
+    },
+    {
+      "index": 4,
+      "page": 4,
+      "path": "D:\\银行agent项目\\bankagent\\.dsh-office-6b221086888448ddbfb037505026cdb5\\tech\\page-0004.png",
+      "width": 1191,
+      "height": 1684,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 793.7333333333333,
+        "height": 1122.5333333333333
+      },
+      "byteLength": 139867
+    },
+    {
+      "index": 5,
+      "page": 5,
+      "path": "D:\\银行agent项目\\bankagent\\.dsh-office-6b221086888448ddbfb037505026cdb5\\tech\\page-0005.png",
+      "width": 1191,
+      "height": 1684,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 793.7333333333333,
+        "height": 1122.5333333333333
+      },
+      "byteLength": 101804
+    }
+  ],
+  "missingFonts": [
+    "Courier"
+  ]
+}

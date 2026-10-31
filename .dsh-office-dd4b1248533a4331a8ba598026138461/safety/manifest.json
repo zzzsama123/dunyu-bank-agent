@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "backend": "native",
+  "rasterEngine": "pdfium",
+  "source": "saved",
+  "inputPath": "D:\\银行agent项目\\bankagent\\deliverables\\盾语_安全自评报告.pdf",
+  "sourceSha256": "5853963925d7a34ea5724dbcbec4aee7f3101a6e1fd1e9755ff6e3a52b017031",
+  "dpi": 144,
+  "pageCount": 2,
+  "images": [
+    {
+      "index": 1,
+      "page": 1,
+      "path": "D:\\银行agent项目\\bankagent\\.dsh-office-dd4b1248533a4331a8ba598026138461\\safety\\page-0001.png",
+      "width": 1191,
+      "height": 1684,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 793.7333333333333,
+        "height": 1122.5333333333333
+      },
+      "byteLength": 315922
+    },
+    {
+      "index": 2,
+      "page": 2,
+      "path": "D:\\银行agent项目\\bankagent\\.dsh-office-dd4b1248533a4331a8ba598026138461\\safety\\page-0002.png",
+      "width": 1191,
+      "height": 1684,
+      "rectangle": {
+        "x": 0,
+        "y": 0,
+        "width": 793.7333333333333,
+        "height": 1122.5333333333333
+      },
+      "byteLength": 278310
+    }
+  ],
+  "missingFonts": []
+}

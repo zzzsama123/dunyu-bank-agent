@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#081c33">
+  <meta name="description" content="盾语（仿真环境）：一句话办理账单分析、订阅管理、转账与长期计划。权限分级、策略裁决、全链路哈希链审计。">
+  <title>盾语 · 银行 AI 智能体（仿真环境）</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'%3E%3Crect width='44' height='44' rx='12' fill='%230d2b4e'/%3E%3Cpath d='M22 8.5l10.5 4.2v6.4c0 6.6-4.4 11.2-10.5 13.7C15.9 30.3 11.5 25.7 11.5 19.1v-6.4L22 8.5z' fill='none' stroke='%23e6c98b' stroke-width='1.6'/%3E%3Cpath d='M16.3 17.2h11.4M17.2 19.7h9.6M18.2 22.2h7.6M19.2 24.7h5.6M22 13.8v2.2' stroke='%23e6c98b' stroke-width='1.2'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="./styles.css?v=20261031h">
+</head>
+<body>
+  <a class="skip-link" href="#composer-input">跳到消息输入框</a>
+
+  <div id="app">
+    <!-- ==================== 对话页 ==================== -->
+    <div class="shell" id="chat-view">
+      <aside class="sidebar" id="sidebar" aria-label="品牌、会话状态与演示指令">
+        <div class="sidebar-glow" aria-hidden="true"></div>
+        <button type="button" class="sidebar-close" id="sidebar-close" aria-label="关闭侧边栏">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+        </button>
+
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 44 44" role="img">
+              <rect x="1" y="1" width="42" height="42" rx="12" fill="#0d2b4e" stroke="rgba(230,201,139,.42)" stroke-width="1"></rect>
+              <path d="M22 8.5l10.5 4.2v6.4c0 6.6-4.4 11.2-10.5 13.7C15.9 30.3 11.5 25.7 11.5 19.1v-6.4L22 8.5z" fill="none" stroke="#e6c98b" stroke-width="1.35"></path>
+              <path d="M16.3 17.2h11.4M17.2 19.7h9.6M18.2 22.2h7.6M19.2 24.7h5.6M22 13.8v2.2" fill="none" stroke="#e6c98b" stroke-width="1.15" stroke-linecap="round"></path>
+            </svg>
+          </span>
+          <div class="brand-copy">
+            <div class="brand-name">盾语</div>
+            <div class="brand-sub">银行 AI 智能体 · 仿真环境</div>
+          </div>
+        </div>
+
+        <button type="button" class="new-session-cta" id="new-session-btn">
+          <span class="new-session-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>
+          </span>
+          <span class="new-session-copy">
+            <strong>开启新对话</strong>
+            <small>清空当前上下文，重新开始</small>
+          </span>
+          <span class="new-session-arrow" aria-hidden="true">→</span>
+        </button>
+
+        <div class="sidebar-scroll">
+          <section class="session-panel" aria-labelledby="session-panel-title">
+            <div class="panel-head">
+              <span class="panel-label" id="session-panel-title">当前会话</span>
+              <span class="live-chip"><span class="live-dot" aria-hidden="true"></span>实时</span>
+            </div>
+            <div class="session-status">
+              <span class="state-orb" data-state-dot aria-hidden="true"></span>
+              <div class="session-status-copy">
+                <span class="session-status-label" data-state-label>NORMAL</span>
+                <span class="session-status-desc" data-state-desc>会话状态正常</span>
+              </div>
+            </div>
+            <div class="session-id-row">
+              <span>会话标识</span>
+              <code id="sidebar-session-id">sess_········</code>
+              <button type="button" class="mini-icon-button" id="copy-session-btn" aria-label="复制会话标识" title="复制会话标识">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M5 15V6a2 2 0 0 1 2-2h9"></path></svg>
+              </button>
+            </div>
+            <p class="session-note">连续失败会自动进入观察 / 锁定；查询类操作不受影响。</p>
+          </section>
+
+          <section class="side-section">
+            <button type="button" class="side-security" id="side-security">
+              <span class="side-security-icon">◈</span>
+              <span class="side-security-copy"><strong>安全证据</strong><small>亲手验证一次</small></span>
+              <span class="side-security-arrow">→</span>
+            </button>
+          </section>
+
+          <section class="side-section" aria-labelledby="quick-title">
+            <div class="side-heading">
+              <span id="quick-title">演示指令</span>
+              <span class="side-hint">点击即发送</span>
+            </div>
+            <div class="quick-list" id="quick-list"></div>
+          </section>
+
+          <section class="side-section" id="history-section" aria-labelledby="history-title" hidden>
+            <div class="side-heading">
+              <span id="history-title">历史会话</span>
+              <span class="side-hint">点击切换</span>
+            </div>
+            <div class="history-list" id="history-list"></div>
+          </section>
+
+          <section class="side-section" id="recent-section" aria-labelledby="recent-title" hidden>
+            <div class="side-heading">
+              <span id="recent-title">最近审计</span>
+              <button type="button" class="side-link" id="audit-all-side">全部</button>
+            </div>
+            <div class="recent-list" id="recent-list"></div>
+          </section>
+
+          <section class="side-section side-trust" aria-labelledby="trust-title">
+            <div class="side-heading"><span id="trust-title">安全能力</span></div>
+            <div class="trust-chips" aria-label="安全能力">
+              <span>三级权限</span>
+              <span>哈希链审计</span>
+              <span>注入防护</span>
+              <span>熔断限流</span>
+            </div>
+          </section>
+        </div>
+
+        <div class="sidebar-foot">
+          <div class="sim-badge"><span aria-hidden="true"></span>仿真环境 · 不涉及真实资金</div>
+          <div class="sidebar-foot-row">
+            <span class="backend-version" id="backend-version"><span class="conn-dot" id="conn-dot" aria-hidden="true"></span><span id="backend-version-text">连接检测中…</span></span>
+
+          </div>
+        </div>
+      </aside>
+      <div class="sidebar-backdrop" id="sidebar-backdrop" hidden></div>
+
+      <div class="workspace">
+        <div class="mobile-topbar">
+          <div class="brand brand-compact">
+            <span class="brand-mark" aria-hidden="true">
+              <svg viewBox="0 0 44 44" role="img">
+                <rect x="1" y="1" width="42" height="42" rx="12" fill="#0d2b4e" stroke="rgba(230,201,139,.42)" stroke-width="1"></rect>
+                <path d="M22 8.5l10.5 4.2v6.4c0 6.6-4.4 11.2-10.5 13.7C15.9 30.3 11.5 25.7 11.5 19.1v-6.4L22 8.5z" fill="none" stroke="#e6c98b" stroke-width="1.35"></path>
+                <path d="M16.3 17.2h11.4M17.2 19.7h9.6M18.2 22.2h7.6M19.2 24.7h5.6M22 13.8v2.2" fill="none" stroke="#e6c98b" stroke-width="1.15" stroke-linecap="round"></path>
+              </svg>
+            </span>
+            <div class="brand-copy">
+              <div class="brand-name">盾语</div>
+              <div class="brand-sub">银行 AI 智能体 · 仿真环境</div>
+            </div>
+          </div>
+          <div class="mobile-topbar-actions">
+            <button type="button" class="mobile-icon-button" id="mobile-settings-btn" aria-label="设置" title="设置">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path></svg>
+            </button>
+            <button type="button" class="mobile-icon-button" id="mobile-menu-btn" aria-label="打开侧边栏" aria-expanded="false" aria-controls="sidebar">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"></path></svg>
+            </button>
+            <button type="button" class="mobile-icon-button" id="mobile-audit-btn" aria-label="打开最近一次审计回放" title="审计回放">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3 2"></path></svg>
+            </button>
+            <div class="state-badge state-badge-compact" data-state-badge>
+              <span class="state-dot" data-state-dot aria-hidden="true"></span>
+              <span class="state-badge-label" data-state-label>NORMAL</span>
+            </div>
+          </div>
+        </div>
+
+        <header class="topbar">
+          <div class="topbar-heading">
+            <div class="eyebrow"><span class="eyebrow-rule" aria-hidden="true"></span>智能银行助手</div>
+            <h1>您好，今天想办点什么？</h1>
+          </div>
+          <div class="topbar-actions">
+            <button type="button" class="brain-pill" id="brain-pill" title="理解模式">
+              <span class="brain-dot" aria-hidden="true"></span><span id="brain-pill-label">规则模式</span>
+            </button>
+            <button type="button" class="audit-shortcut" id="settings-shortcut" title="设置">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path></svg>
+              <span>设置</span>
+            </button>
+            <button type="button" class="audit-shortcut" id="audit-shortcut" title="打开最近一次审计回放">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3 2"></path></svg>
+              <span>审计回放</span>
+            </button>
+            <div class="state-badge" data-state-badge title="会话状态">
+              <span class="state-dot" data-state-dot aria-hidden="true"></span>
+              <span class="state-badge-copy">
+                <span class="state-badge-label" data-state-label>NORMAL</span>
+                <span class="state-badge-desc" data-state-desc>会话正常</span>
+              </span>
+            </div>
+          </div>
+        </header>
+
+        <div class="quick-strip-wrap">
+          <span class="quick-strip-label">演示指令</span>
+          <div class="quick-strip" id="quick-strip" aria-label="快捷演示指令"></div>
+        </div>
+
+        <div class="connection-banner" id="connection-banner" role="alert" hidden>
+          <svg class="icon banner-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 8.5v4.2"></path><circle cx="12" cy="16.4" r=".9" fill="currentColor" stroke="none"></circle><path d="M10.3 4.2L3.5 17.1a1.5 1.5 0 0 0 1.3 2.2h14.4a1.5 1.5 0 0 0 1.3-2.2L13.7 4.2a1.9 1.9 0 0 0-3.4 0z"></path></svg>
+          <div class="banner-copy">
+            <strong>银行服务暂时无法连接</strong>
+            <span id="connection-text">界面可正常浏览；请确认后端已启动后重试。</span>
+          </div>
+          <button type="button" class="banner-button" id="connection-retry">重试连接</button>
+        </div>
+
+        <div class="session-banner" id="session-banner" role="status" hidden>
+          <svg class="icon banner-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7.5 3v5.2c0 4.9-3.2 8.3-7.5 10.1-4.3-1.8-7.5-5.2-7.5-10.1V6L12 3z"></path><path d="M12 8v4"></path><circle cx="12" cy="15.4" r=".9" fill="currentColor" stroke="none"></circle></svg>
+          <div class="banner-copy">
+            <strong id="session-banner-title">会话处于观察状态</strong>
+            <span id="session-banner-text">部分敏感操作可能要求额外验证。</span>
+          </div>
+          <button type="button" class="banner-button" id="session-banner-action" hidden>开启新会话</button>
+        </div>
+
+        <section class="chat-scroll" id="chat-scroll" aria-label="对话内容">
+          <div class="chat-stream" id="chat-stream" role="log" aria-live="polite" aria-relevant="additions">
+            <div class="chat-date"><span>今天 · 演示会话</span></div>
+
+            <article class="msg assistant welcome-message" id="welcome-message">
+              <span class="avatar assistant-avatar" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7.5 3v5.2c0 4.9-3.2 8.3-7.5 10.1-4.3-1.8-7.5-5.2-7.5-10.1V6L12 3z"></path><path d="M9 12l2 2 4-4"></path></svg>
+              </span>
+              <div class="msg-body">
+                <div class="msg-meta">
+                  <span class="msg-author">AI 助手</span>
+                  <span class="meta-sep" aria-hidden="true"></span>
+                  <time id="welcome-time">--:--</time>
+                </div>
+                <div class="welcome-card">
+                  <div class="welcome-orbit" aria-hidden="true"></div>
+                  <div class="welcome-eyebrow">DUNYU · 银行 AI 智能体</div>
+                  <h2>你好，我是盾语的银行 AI 助手。</h2>
+                  <p>听得懂，也守得住。查账单、退会员、转账，直接告诉我就行。</p>
+                  <div class="welcome-examples" aria-label="示例指令">
+                    <button type="button" class="example-chip" data-example="我这个月钱都去哪了">我这个月钱都去哪了</button>
+                    <button type="button" class="example-chip" data-example="把没用的会员退掉">把没用的会员退掉</button>
+                    <button type="button" class="example-chip" data-example="转 500 给我妈">转 500 给我妈</button>
+                  </div>
+                  <button type="button" class="welcome-security" id="welcome-security">亲手验证一次</button>
+                  <div class="welcome-tip">
+                    <span class="welcome-tip-dot" aria-hidden="true"></span>
+                    仿真环境 · 所有操作不产生真实资金变动
+                  </div>
+                </div>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <div class="composer-dock">
+          <form class="composer" id="composer-form" autocomplete="off" novalidate>
+            <textarea id="composer-input" rows="1" maxlength="500" placeholder="说说您想办理的业务，例如「帮我转 500 给我妈」" aria-label="消息输入"></textarea>
+            <div class="composer-actions">
+              <button type="button" class="voice-button" id="voice-btn" aria-label="语音输入" aria-pressed="false" title="语音输入（需浏览器支持）">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"></rect><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0"></path><path d="M12 18v2.5"></path></svg>
+              </button>
+              <span class="char-count" id="char-count" hidden>0/500</span>
+              <button type="submit" class="send-button" id="send-btn" disabled aria-label="发送消息">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 11.5L20 4.5l-4.2 15.2-4.4-6.2-5.1-2z"></path><path d="M11.4 13.5l4.4-4.5"></path></svg>
+              </button>
+            </div>
+          </form>
+          <div class="composer-meta">
+            <span class="composer-shortcut">Enter 发送 · Shift + Enter 换行</span>
+            <span class="composer-disclaimer">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2"></rect><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"></path></svg>
+              AI 生成内容仅供参考 · 资金操作需您确认
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+      <button type="button" class="fab" id="fab-tools" aria-label="打开快捷功能" aria-expanded="false">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="1.6"></rect><rect x="14" y="4" width="6" height="6" rx="1.6"></rect><rect x="4" y="14" width="6" height="6" rx="1.6"></rect><rect x="14" y="14" width="6" height="6" rx="1.6"></rect></svg>
+      </button>
+      <div class="tool-backdrop" id="tool-backdrop" hidden></div>
+      <section class="tool-sheet" id="tool-sheet" hidden aria-label="快捷功能">
+        <header class="tool-head">
+          <strong>快捷功能</strong>
+          <button type="button" class="tool-close" id="tool-close" aria-label="关闭快捷功能">×</button>
+        </header>
+        <div class="tool-grid">
+          <button type="button" data-tool="bill"><span class="tool-dot tone-blue"></span>查账单</button>
+          <button type="button" data-tool="transfer"><span class="tool-dot tone-green"></span>转账</button>
+          <button type="button" data-tool="subs"><span class="tool-dot tone-violet"></span>退订阅</button>
+          <button type="button" data-tool="card"><span class="tool-dot tone-red"></span>卡片挂失</button>
+          <button type="button" data-tool="wealth"><span class="tool-dot tone-amber"></span>理财</button>
+          <button type="button" data-tool="plan"><span class="tool-dot tone-teal"></span>生日计划</button>
+          <button type="button" data-tool="quota"><span class="tool-dot tone-blue"></span>转账限额</button>
+          <button type="button" data-tool="annual"><span class="tool-dot tone-violet"></span>订阅年费</button>
+          <button type="button" data-tool="latest"><span class="tool-dot tone-green"></span>最近一笔</button>
+          <button type="button" data-tool="contacts"><span class="tool-dot tone-amber"></span>我的联系人</button>
+          <button type="button" data-tool="anomaly"><span class="tool-dot tone-red"></span>异常排查</button>
+          <button type="button" data-tool="fee"><span class="tool-dot tone-teal"></span>到账规则</button>
+          <button type="button" data-tool="budget"><span class="tool-dot tone-green"></span>预算管理</button>
+          <button type="button" data-tool="calc"><span class="tool-dot tone-amber"></span>分期试算</button>
+          <button type="button" data-tool="export"><span class="tool-dot tone-blue"></span>导出账单</button>
+          <button type="button" data-tool="repay"><span class="tool-dot tone-amber"></span>贷款还款</button>
+          <button type="button" data-tool="risk"><span class="tool-dot tone-green"></span>风险测评</button>
+          <button type="button" data-tool="password"><span class="tool-dot tone-red"></span>重置密码</button>
+        </div>
+        <form class="tool-form" id="transfer-form" hidden>
+          <label>收款人
+            <select id="tf-contact"></select>
+          </label>
+          <label>金额（元）
+            <input id="tf-amount" type="number" min="0.01" step="0.01" placeholder="例如 100">
+          </label>
+          <label>备注（可选）
+            <input id="tf-memo" maxlength="30" placeholder="例如 生活费">
+          </label>
+          <button type="submit" class="tool-submit">生成转账指令</button>
+        </form>
+      </section>
+    <!-- ==================== 全量审计 ==================== -->
+    <div class="audit-index-backdrop" id="audit-index-backdrop" hidden></div>
+    <section class="audit-index" id="audit-index" hidden aria-label="全量审计">
+      <header class="audit-index-head">
+        <div>
+          <strong>全量审计</strong>
+          <span id="audit-index-count">加载中…</span>
+        </div>
+        <button type="button" class="tool-close" id="audit-index-close" aria-label="关闭">×</button>
+      </header>
+      <input type="search" class="audit-index-search" id="audit-index-search" placeholder="搜索说法、trace id 或动作">
+      <div class="audit-index-list" id="audit-index-list"></div>
+    </section>
+    <!-- ==================== 导出流水 ==================== -->
+    <div class="export-backdrop" id="export-backdrop" hidden></div>
+    <section class="export-dialog" id="export-dialog" hidden aria-label="导出流水">
+      <header class="export-head">
+        <strong>导出流水</strong>
+        <button type="button" class="tool-close" id="export-close" aria-label="关闭导出">×</button>
+      </header>
+      <label class="export-field">时间范围
+        <select id="export-range" class="setting-select"></select>
+      </label>
+      <label class="export-field">对象
+        <select id="export-party" class="setting-select"></select>
+      </label>
+      <label class="export-field">格式
+        <select id="export-format" class="setting-select">
+          <option value="xlsx">Excel（.xlsx，推荐）</option>
+          <option value="csv">CSV（.csv）</option>
+        </select>
+      </label>
+      <p class="setting-note">Excel 已设置列宽、日期按文本写入；CSV 适合导入其他系统。只包含当前演示数据。</p>
+      <button type="button" class="export-submit" id="export-download">下载文件</button>
+    </section>
+    <!-- ==================== 设置页 ==================== -->
+    <section class="settings-shell" id="settings-view" hidden aria-label="设置">
+      <header class="settings-topbar">
+        <div class="settings-title">
+          <span class="eyebrow"><span class="eyebrow-rule" aria-hidden="true"></span>偏好设置</span>
+          <h1>设置</h1>
+        </div>
+        <button type="button" class="settings-back" id="settings-close">返回对话</button>
+      </header>
+      <div class="settings-body">
+        <nav class="settings-nav" aria-label="设置分类">
+          <button type="button" data-section="general" class="is-active">通用</button>
+          <button type="button" data-section="identity">身份</button>
+          <button type="button" data-section="security">安全</button>
+          <button type="button" data-section="chat">对话</button>
+          <button type="button" data-section="voice">语音</button>
+          <button type="button" data-section="data">数据</button>
+          <button type="button" data-section="ops">运营</button>
+          <button type="button" data-section="demo">演示</button>
+          <button type="button" data-section="about">关于</button>
+        </nav>
+        <div class="settings-content">
+          <section class="settings-panel" data-panel="general">
+            <h2>通用</h2>
+            <div class="setting-row">
+              <div class="setting-copy"><strong>字号</strong><span>调整界面文字大小</span></div>
+              <select id="set-font" class="setting-select">
+                <option value="normal">标准</option>
+                <option value="large">大</option>
+              </select>
+            </div>
+            <div class="setting-row">
+              <div class="setting-copy"><strong>消息密度</strong><span>舒适或紧凑的消息间距</span></div>
+              <select id="set-density" class="setting-select">
+                <option value="comfortable">舒适</option>
+                <option value="compact">紧凑</option>
+              </select>
+            </div>
+            <div class="setting-row">
+              <div class="setting-copy"><strong>执行详情默认展开</strong><span>每条结果下方的内部执行轨迹</span></div>
+              <label class="switch"><input type="checkbox" id="set-details"><span></span></label>
+            </div>
+          </section>
+
+          <section class="settings-panel" data-panel="identity" hidden>
+            <h2>身份与准入</h2>
+            <div class="identity-grid" id="identity-grid"></div>
+            <div class="setting-row">
+              <div class="setting-copy"><strong>本机设备</strong><span id="identity-device">检测中…</span></div>
+              <button type="button" class="settings-secondary" id="identity-bind">绑定此设备</button>
+            </div>
+            <h3 class="settings-subtitle">代办授权</h3>
+            <div class="identity-form">
+              <input id="auth-name" class="setting-select" placeholder="代办人姓名" maxlength="20">
+              <select id="auth-relation" class="setting-select">
+                <option value="配偶">配偶</option><option value="父母">父母</option>
+                <option value="子女">子女</option><option value="其他">其他</option>
+              </select>
+              <select id="auth-scope" class="setting-select">
+                <option value="query">仅查询</option><option value="small">查询+小额</option>
+                <option value="all">全部</option>
+              </select>
+              <select id="auth-days" class="setting-select">
+                <option value="7">7 天</option><option value="30" selected>30 天</option>
+                <option value="90">90 天</option>
+              </select>
+              <button type="button" class="settings-secondary" id="auth-add">添加授权</button>
+            </div>
+            <div class="identity-auth-list" id="auth-list"></div>
+            <p class="setting-note">授权委托仅用于演示：代办请求需在 API 中携带 act_as 且授权有效；所有使用会写入审计。</p>
+          </section>
+          <section class="settings-panel" data-panel="security" hidden>
+            <h2>安全证据</h2>
+            <p class="setting-note">下面三项在隔离的临时库运行。你可以亲手把系统弄坏，看它是否拦住。</p>
+            <div class="security-grid">
+              <div class="security-card">
+                <strong>篡改确认 token</strong>
+                <span>把 token 最后一位改掉，确认卡应失效</span>
+                <button type="button" class="settings-secondary" data-security="token">运行</button>
+              </div>
+              <div class="security-card">
+                <strong>篡改确认金额</strong>
+                <span>保留 token，改金额，params_hash 应不匹配</span>
+                <button type="button" class="settings-secondary" data-security="params">运行</button>
+              </div>
+              <div class="security-card">
+                <strong>篡改审计记录</strong>
+                <span>改一行 payload，哈希链应断裂</span>
+                <button type="button" class="settings-secondary" data-security="audit">运行</button>
+              </div>
+            </div>
+            <pre class="security-result" id="security-result" hidden></pre>
+          </section>
+
+          <section class="settings-panel" data-panel="chat" hidden>
+            <h2>对话</h2>
+            <div class="setting-row">
+              <div class="setting-copy"><strong>语音输入</strong><span>显示输入框旁的麦克风按钮</span></div>
+              <label class="switch"><input type="checkbox" id="set-voice"><span></span></label>
+            </div>
+            <div class="setting-row">
+              <div class="setting-copy"><strong>回车发送</strong><span>关闭后用 Ctrl + Enter 发送</span></div>
+              <label class="switch"><input type="checkbox" id="set-enter"><span></span></label>
+            </div>
+            <div class="setting-row">
+              <div class="setting-copy"><strong>保存会话历史</strong><span>仅保存在本机浏览器，不上传</span></div>
+              <label class="switch"><input type="checkbox" id="set-history"><span></span></label>
+            </div>
+            <div class="setting-row">
+              <div class="setting-copy"><strong>理解模式</strong><span id="brain-mode-note">规则模式（默认，无需 Key）</span></div>
+              <select id="brain-mode" class="setting-select" disabled>
+                <option value="rules">规则模式（可离线）</option>
+                <option value="llm">大模型模式（需配置 Key）</option>
+              </select>
+            </div>
+          </section>
+
+            <div class="setting-row">
+              <div class="setting-copy"><strong>API Key</strong><span id="llm-key-note">Key 只保存在本机，不回显、不写入审计</span></div>
+            </div>
+            <div class="llm-key-form">
+              <input type="password" id="llm-key-input" class="llm-key-input" placeholder="sk-... 或 DeepSeek API Key" autocomplete="off" spellcheck="false">
+              <button type="button" class="settings-secondary llm-key-save" id="llm-key-save">保存并启用</button>
+              <button type="button" class="settings-secondary" id="llm-key-clear">清除</button>
+            </div>
+            <p class="setting-note">保存后立即切换到大模型模式；调用失败会自动回退规则，安全边界不变。Key 仅用于本机请求，不会下发到前端。</p>
+
+          <section class="settings-panel" data-panel="voice" hidden>
+            <h2>语音</h2>
+            <div class="voice-status-card">
+              <div>
+                <strong id="voice-engine">检测中…</strong>
+                <span id="voice-detail">离线语音识别状态</span>
+              </div>
+              <button type="button" class="settings-secondary" id="voice-retest">重新检测</button>
+            </div>
+            <p class="setting-note">离线识别在本机运行，不联网、不上传音频。首次使用需允许浏览器访问麦克风；手机端需 HTTPS。</p>
+          </section>
+
+          <section class="settings-panel" data-panel="data" hidden>
+            <h2>数据</h2>
+            <div class="setting-row">
+              <div class="setting-copy"><strong>清除本机对话历史</strong><span>删除浏览器里保存的所有历史会话，不影响演示数据</span></div>
+              <button type="button" class="settings-danger" id="clear-history">清除</button>
+            </div>
+            <div class="setting-row">
+              <div class="setting-copy"><strong>导出本月流水</strong><span>CSV 文件，可用 Excel 打开</span></div>
+              <button type="button" class="settings-secondary" id="export-transactions">导出</button>
+            </div>
+            <p class="setting-note">演示数据库（余额、流水、订阅）由本机后端维护，如需恢复初始状态，请关闭服务后删除 `backend/data/bank.db` 再启动。</p>
+          </section>
+
+
+          <section class="settings-panel" data-panel="demo" hidden>
+            <h2>一键演示</h2>
+            <p class="setting-note">在隔离临时库跑完整五幕，不影响当前对话与演示数据。现场状态被弄乱时，用这个兜底。</p>
+            <button type="button" class="settings-secondary" id="demo-run">生成五幕脚本</button>
+            <div class="ops-badcases" id="demo-scenes" style="margin-top:12px"></div>
+          </section>
+
+          <section class="settings-panel" data-panel="ops" hidden>
+            <h2>运营</h2>
+            <div class="ops-grid" id="ops-metrics"></div>
+            <div class="setting-row">
+              <div class="setting-copy"><strong>badcase 归集</strong><span>来自每条回复的「没帮上」反馈</span></div>
+              <button type="button" class="settings-secondary" id="ops-refresh">刷新</button>
+            </div>
+            <div class="ops-badcases" id="ops-badcases"></div>
+            <h3 class="settings-subtitle">知识版本</h3>
+            <div class="ops-badcases" id="ops-knowledge"></div>
+            <div class="identity-form">
+              <select id="kb-entry" class="setting-select"></select>
+              <input id="kb-content" class="setting-select" placeholder="新版本内容（留空则用当前内容）">
+              <button type="button" class="settings-secondary" id="kb-draft">新建草稿</button>
+            </div>
+            <h3 class="settings-subtitle">工单</h3>
+            <div class="ops-badcases" id="ops-tickets"></div>
+            <h3 class="settings-subtitle">灰度与实验</h3>
+            <div class="ops-badcases" id="ops-flags"></div>
+            <p class="setting-note" id="ops-ab">A/B：加载中…</p>
+            <p class="setting-note">流程：草稿 → 审批 → 发布；发布后同条目旧版本自动 retired，过期条目由定时任务下架。</p>
+            <p class="setting-note">指标来自本机审计链与反馈表；badcase 可直接点开对应 trace 复盘。知识库有效/过期数量也会同步显示。</p>
+          </section>
+
+          <section class="settings-panel" data-panel="about" hidden>
+            <h2>关于</h2>
+            <dl class="about-list">
+              <div><dt>版本</dt><dd id="about-version">v1.0.0</dd></div>
+              <div><dt>运行模式</dt><dd id="about-mode">规则模式（无需 Key）</dd></div>
+              <div><dt>服务地址</dt><dd id="about-port">http://127.0.0.1:8000</dd></div>
+              <div><dt>语音引擎</dt><dd id="about-asr">检测中…</dd></div>
+            </dl>
+            <p class="setting-note">仿真环境，全部为合成数据，不涉及真实资金。开源依赖与许可见 docs/。</p>
+          </section>
+        </div>
+      </div>
+    </section>
+    <!-- ==================== 审计页 ==================== -->
+    <div class="audit-shell" id="audit-view" hidden>
+      <header class="audit-topbar">
+        <div class="brand brand-audit">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 44 44" role="img">
+              <rect x="1" y="1" width="42" height="42" rx="12" fill="#0d2b4e" stroke="rgba(230,201,139,.42)" stroke-width="1"></rect>
+              <path d="M22 8.5l10.5 4.2v6.4c0 6.6-4.4 11.2-10.5 13.7C15.9 30.3 11.5 25.7 11.5 19.1v-6.4L22 8.5z" fill="none" stroke="#e6c98b" stroke-width="1.35"></path>
+              <path d="M16.3 17.2h11.4M17.2 19.7h9.6M18.2 22.2h7.6M19.2 24.7h5.6M22 13.8v2.2" fill="none" stroke="#e6c98b" stroke-width="1.15" stroke-linecap="round"></path>
+            </svg>
+          </span>
+          <div class="brand-copy">
+            <div class="brand-name">盾语</div>
+            <div class="brand-sub">审计回放 · 仿真环境</div>
+          </div>
+        </div>
+        <button type="button" class="audit-all-btn" id="audit-all-btn">全部审计</button>
+        <button type="button" class="back-button" id="audit-back-btn">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg>
+          返回对话
+        </button>
+      </header>
+
+      <main class="audit-main">
+        <section class="audit-hero">
+          <div class="audit-hero-copy">
+            <div class="eyebrow eyebrow-gold"><span class="eyebrow-rule" aria-hidden="true"></span>AUDIT TRAIL · 决策全链路</div>
+            <h1>审计回放</h1>
+            <p>每一次理解、裁决与执行，都留下可校验的痕迹。</p>
+            <p class="audit-scope-note">这里展示的是决策事件（理解 / 计划 / 策略 / 执行），不是流水明细。要看完整流水，请回对话说「全部展示」。</p>
+          </div>
+          <div class="audit-trace-box">
+            <span class="trace-label">TRACE ID</span>
+            <div class="trace-value-row">
+              <code id="audit-trace-id">—</code>
+              <button type="button" class="mini-icon-button mini-icon-button-dark" id="audit-copy-btn" aria-label="复制 trace_id" title="复制 trace_id">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M5 15V6a2 2 0 0 1 2-2h9"></path></svg>
+              </button>
+            </div>
+            <button type="button" class="audit-download" id="audit-download-btn" disabled>
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11"></path><path d="M7.5 10.5L12 15l4.5-4.5"></path><path d="M5 19.5h14"></path></svg>
+              下载 JSON
+            </button>
+          </div>
+        </section>
+
+        <div class="audit-content" id="audit-content">
+          <div class="audit-loading" aria-label="审计记录加载中">
+            <div class="skeleton skeleton-summary"></div>
+            <div class="skeleton skeleton-line"></div>
+            <div class="skeleton skeleton-line short"></div>
+            <div class="skeleton skeleton-line"></div>
+          </div>
+        </div>
+
+        <footer class="audit-foot">审计数据来自 <code>GET /v1/audit/{trace_id}</code> · 哈希链逐条校验 · 仿真环境</footer>
+      </main>
+    </div>
+  </div>
+
+  <!-- ==================== 强验证弹窗 ==================== -->
+  <div class="modal" id="stepup-modal" hidden>
+    <div class="modal-backdrop" id="stepup-backdrop"></div>
+    <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="stepup-title" aria-describedby="stepup-desc">
+      <button type="button" class="modal-close" id="stepup-close" aria-label="关闭验证弹窗">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+      </button>
+      <div class="stepup-emblem" aria-hidden="true">
+        <svg viewBox="0 0 48 48" fill="none">
+          <path d="M24 5l14 5.5v9.6C38 29.3 32.1 36.6 24 40 15.9 36.6 10 29.3 10 20.1v-9.6L24 5z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path>
+          <path d="M18 23.5l4 4 8.5-8.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+      </div>
+      <div class="eyebrow eyebrow-center">SECURE VERIFICATION</div>
+      <h2 id="stepup-title">安全验证</h2>
+      <p id="stepup-desc">为保护您的资金安全，请输入短信验证码。</p>
+      <div class="stepup-hint" id="stepup-hint">演示验证码 <strong>123456</strong></div>
+      <form class="stepup-form" id="stepup-form" novalidate>
+        <div class="code-inputs" id="stepup-code-inputs" role="group" aria-label="6 位验证码">
+          <input class="code-input" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="1" aria-label="验证码第 1 位">
+          <input class="code-input" type="text" inputmode="numeric" maxlength="1" aria-label="验证码第 2 位">
+          <input class="code-input" type="text" inputmode="numeric" maxlength="1" aria-label="验证码第 3 位">
+          <input class="code-input" type="text" inputmode="numeric" maxlength="1" aria-label="验证码第 4 位">
+          <input class="code-input" type="text" inputmode="numeric" maxlength="1" aria-label="验证码第 5 位">
+          <input class="code-input" type="text" inputmode="numeric" maxlength="1" aria-label="验证码第 6 位">
+        </div>
+        <div class="form-error" id="stepup-error" role="alert" hidden></div>
+        <button type="submit" class="btn btn-primary btn-block" id="stepup-submit" disabled>验证并继续</button>
+      </form>
+      <button type="button" class="modal-later" id="stepup-later">稍后验证</button>
+      <p class="modal-security">强验证连续失败 3 次将锁定会话 15 分钟</p>
+    </div>
+  </div>
+
+  <div class="toast-stack" id="toast-stack" role="status" aria-live="polite"></div>
+
+  <noscript>
+    <div class="noscript-note">本演示需要启用 JavaScript 才能连接 AI 智能体。</div>
+  </noscript>
+
+  <script src="./app.js?v=20261031h"></script>
+</body>
+</html>
