@@ -1112,6 +1112,29 @@ def tool_reverse_transfer(conn, user_id: int, args: dict) -> dict:
     })
 
 
+
+
+def tool_schedule_transfer(conn, user_id: int, args: dict) -> dict:
+    amount = int(_int_arg(args, "amount", min_value=1))
+    run_at = str(args.get("run_at") or "").strip()
+    if not run_at:
+        return {"ok": False, "data": {}, "facts": [], "error": {"code": "E_PARAM", "message": "缺少执行时间"}}
+    contact_id = args.get("contact_id")
+    payee = str(args.get("payee") or "").strip()
+    contact = bankcore.find_contact(conn, user_id, payee) if payee else []
+    if not contact_id and len(contact) == 1:
+        contact_id = int(contact[0]["id"])
+        payee = contact[0]["name"]
+    cur = conn.execute(
+        "INSERT INTO scheduled_transfers(user_id,payee,contact_id,amount,run_at,status,created_at) "
+        "VALUES(?,?,?,?,?,'scheduled',?)",
+        (user_id, payee or "收款人", contact_id, amount, run_at, config.now_iso()),
+    )
+    sid = int(cur.lastrowid)
+    return _ok({"schedule_id": sid, "amount_cents": amount, "run_at": run_at,
+                "payee": payee or "收款人", "status": "scheduled"})
+
+
 REGISTRY: dict[str, Callable[..., dict]] = {
     # 绿
     "get_accounts": tool_get_accounts,
@@ -1142,6 +1165,7 @@ REGISTRY: dict[str, Callable[..., dict]] = {
     "repay_loan": tool_repay_loan,
     "repay_credit_card": tool_repay_credit_card,
     "reverse_transfer": tool_reverse_transfer,
+    "schedule_transfer": tool_schedule_transfer,
     "risk_assessment": tool_risk_assessment,
     "request_password_reset": tool_reset_password,
     "redeem_wealth": tool_redeem_wealth,

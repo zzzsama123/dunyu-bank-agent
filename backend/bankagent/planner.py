@@ -33,7 +33,7 @@ import secrets
 
 from . import config, specs
 
-INTENT_NAMES = {
+INTENT_NAMES = {"scheduled_transfer", 
     "transfer",
     "bill_analysis",
     "subscription",
@@ -142,6 +142,27 @@ def _get_contacts(node_id: str, alias: str | None = None,
 # ---------------------------------------------------------------------------
 # 各意图
 # ---------------------------------------------------------------------------
+
+
+def _plan_scheduled(intent: dict, slots: dict, ctx: dict) -> tuple[str, list[dict]]:
+    amount = _int(slots.get("amount"))
+    payee = slots.get("payee")
+    run_at = slots.get("run_at") or slots.get("when")
+    if amount is None:
+        return "请补充预约转账金额", []
+    if not payee:
+        return "请补充收款人", []
+    if not run_at:
+        return "请补充预约时间", []
+    n1 = _get_contacts("n1", payee)
+    args = {"contact_id": _ref("n1", "contact_id"), "amount": amount,
+            "run_at": str(run_at), "payee": payee}
+    n2 = _node("n2", "schedule_transfer", args,
+               _provenance(args, {"contact_id": "tool", "amount": _source(intent, "amount"),
+                                  "run_at": _source(intent, "when"), "payee": _source(intent, "payee")}),
+               ["n1"])
+    return f"预约向{payee}转账 {amount / 100:.2f} 元", [n1, n2]
+
 def _plan_transfer(intent: dict, slots: dict, ctx: dict) -> tuple[str, list[dict]]:
     amount = _int(slots.get("amount"))
     payee = slots.get("payee")
@@ -570,7 +591,9 @@ def build_plan(intent: dict, ctx: dict | None = None) -> dict:
         name = "unknown"
     slots = intent.get("slots") if isinstance(intent.get("slots"), dict) else {}
 
-    if name == "transfer":
+    if name == "scheduled_transfer":
+        goal, nodes = _plan_scheduled(intent, slots, ctx)
+    elif name == "transfer":
         goal, nodes = _plan_transfer(intent, slots, ctx)
     elif name == "bill_analysis":
         goal, nodes = _plan_bill(intent, slots)

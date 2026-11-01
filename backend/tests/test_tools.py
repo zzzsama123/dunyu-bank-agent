@@ -228,6 +228,7 @@ class TestRegistry(ToolTestBase):
         run("repay_loan", {"amount": 10_000})
         run("repay_credit_card", {"amount": 10_000})
         run("reverse_transfer", {"txn_id": 1})
+        run("schedule_transfer", {"amount": 10_000, "run_at": "2026-12-01T09:00:00", "payee": "张三"})
         run("risk_assessment", {"level": "稳健型"})
         run("request_password_reset", {"channel": "sms"})
 

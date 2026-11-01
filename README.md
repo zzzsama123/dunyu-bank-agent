@@ -115,13 +115,13 @@ bankagent/
 
 ```powershell
 cd bankagent\backend
-python -m unittest discover tests -v     # 442 个用例
+python -m unittest discover tests -v     # 448 个用例
 python -m eval.runner                    # 243 条评测集
 ```
 
 | 套件 | 结果 |
 |---|---|
-| 单元/集成测试 | **442 项：开发机 441 通过 / 1 跳过；便携版 442 全通过**（约 125s） |
+| 单元/集成测试 | **448 项：开发机 441 通过 / 1 跳过；便携版 448 全通过**（约 125s） |
 | 权限边界 | **60 / 60（100%）** |
 | 意图识别 | **84 / 84（100%）**（含口语/错字/金额/省略/AA/批量） |
 | 红队注入 | **55 / 55（100%）**，越权执行 **0** |

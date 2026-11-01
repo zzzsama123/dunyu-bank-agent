@@ -30,6 +30,7 @@ from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from .normalize import normalize
 
 INTENT_NAMES = (
+    "scheduled_transfer",
     "transfer",
     "bill_analysis",
     "subscription",
@@ -42,6 +43,7 @@ INTENT_NAMES = (
 
 # 同分时的优先级：越靠前越"具体"。transfer 的"转"太常见，放最后。
 _INTENT_PRIORITY = [
+    "scheduled_transfer",
     "service",
     "standing_plan",
     "subscription",
@@ -821,7 +823,7 @@ _KEYWORD_RULES = (
     ("wealth", r"收益|年化|利率", 2),
     ("wealth", r"稳(?:健|一点|赚)", 2),
     ("card", r"挂失", 5),
-    ("card", r"额度|限额", 5),
+    ("card", r"额度|限额|交易限制|单笔限制", 6),
     ("card", r"信用卡|借记卡|银行卡|储蓄卡", 4),
     ("card", r"虚拟卡|补卡", 4),
     ("card", r"卡", 2),
@@ -831,6 +833,7 @@ _KEYWORD_RULES = (
     ("standing_plan", r"提醒我|提醒一下", 5),
     ("standing_plan", r"定.{0,3}提醒", 5),
     ("service", r"还信用卡|信用卡还款|还.{0,4}信用卡", 9),
+    ("scheduled_transfer", r"(下个月|下周|明天|后天).{0,15}(转|打|汇)", 9),
     ("service", r"还款|还房贷|还贷款", 7),
     ("service", r"风险测评|风险测试|风险承受|测评", 6),
     ("service", r"重置密码|忘记密码|改密码|密码忘了|密码重置", 8),
@@ -988,7 +991,29 @@ def _parse(text: str, ctx: dict) -> dict:
     if carry and not last:
         ambiguity.append("没有可继承的上文")
 
-    if name == "transfer":
+    if name == "scheduled_transfer":
+        payee, payee_span = _extract_payee(text)
+        if payee:
+            slots["payee"] = payee
+            spans["payee"] = payee_span or payee
+        else:
+            missing.append("payee")
+        chosen = _pick_amount(text, candidates, "transfer")
+        if chosen:
+            slots["amount"] = chosen["value"]
+            spans["amount"] = chosen["span"]
+        else:
+            missing.append("amount")
+        m_when = re.search(
+            r"(下个月\s*\d{1,2}\s*[号日]|下周[一二三四五六日天]|明天|后天|"
+            r"\d{1,2}\s*月\s*\d{1,2}\s*[号日]|每月\s*\d{1,2}\s*[号日])", text)
+        if m_when:
+            slots["when"] = m_when.group(0)
+            spans["when"] = m_when.group(0)
+        else:
+            missing.append("when")
+
+    elif name == "transfer":
         aa = aa or slots.get("mode") == "collection"
         slots["mode"] = "collection" if aa else "single"
         if aa:
@@ -1165,7 +1190,7 @@ def _parse(text: str, ctx: dict) -> dict:
             slots["action"] = "lost"
         elif re.search(r"解挂|解锁|解冻", text):
             slots["action"] = "unlock"
-        elif re.search(r"额度|限额", text) and re.search(r"调|改|提|降|设置|调整", text):
+        elif re.search(r"额度|限额|交易限制|单笔限制", text) and re.search(r"调|改|提|降|设置|调整|设为|设成|设置成|调成", text):
             slots["action"] = "limit"
         elif re.search(r"申请|虚拟卡|补卡|办卡|新卡", text):
             slots["action"] = "apply"
@@ -1185,7 +1210,7 @@ def _parse(text: str, ctx: dict) -> dict:
                 slots["new_limit"] = chosen["value"]
                 spans["new_limit"] = chosen["span"]
             else:
-                m_limit = re.search(r"(?:调到|调成|调整为|提到|设为|改到)\s*(\d+(?:\.\d+)?)\s*(万)?", text)
+                m_limit = re.search(r"(?:调到|调成|调整为|提到|设为|设成|设置成|改到|改写成)\s*(\d+(?:\.\d+)?)\s*(万)?", text)
                 if m_limit:
                     value = float(m_limit.group(1)) * (10000 if m_limit.group(2) else 1)
                     slots["new_limit"] = int(round(value * 100))

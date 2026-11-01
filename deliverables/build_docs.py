@@ -304,7 +304,7 @@ def build_tech():
 
     doc.add_heading("8. 评测与证据", level=1)
     table(doc, ["项目", "结果", "说明"], [
-        ["单元/集成测试", "442 项：441 通过 / 1 跳过", "开发机；便携版全通过"],
+        ["单元/集成测试", "448 项：441 通过 / 1 跳过", "开发机；便携版全通过"],
         ["评测集", "243 / 243", "意图、权限、红队、端到端"],
         ["红队注入", "58 / 58", "端到端拦截"],
         ["权限边界", "60 / 60", "三级矩阵与拒绝路径"],
@@ -383,7 +383,7 @@ def build_safety():
     bullet(doc, "安全不是“模型更聪明”，而是确认、策略、执行、审计四层都不允许模型越权。")
 
     doc.add_heading("5. 复跑", level=1)
-    code(doc, "cd backend\npython -m unittest discover tests -q      # 442 项\npython -m eval.runner                     # 243 条\npython -m eval.blind_runner               # 30 条盲测")
+    code(doc, "cd backend\npython -m unittest discover tests -q      # 448 项\npython -m eval.runner                     # 243 条\npython -m eval.blind_runner               # 30 条盲测")
     out = OUT / "盾语_安全自评报告.docx"
     doc.save(out)
     return out

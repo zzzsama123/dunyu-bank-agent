@@ -467,6 +467,13 @@ def _confirm_params(conn, user_id: int, plan: dict, level: dict, intent: dict | 
                                 ["到账", "T+1 个工作日（演示）"],
                                 ["确认后", "不可撤回"]]})
         return base
+    if tool == "schedule_transfer":
+        run_at = str(args.get("run_at") or "")
+        base.update({"amount_label": "预约金额",
+                     "fields": [["收款人", contact["name"] if contact else str(args.get("payee") or "")],
+                                ["执行时间", run_at.replace("T", " ")[:16]],
+                                ["说明", "到点前可在审计/计划里取消；现在不扣款"]]})
+        return base
     if tool == "reverse_transfer":
         txn_id = _int(args.get("txn_id"))
         row = conn.execute("SELECT * FROM transactions WHERE id=? AND user_id=?",
@@ -975,7 +982,7 @@ def _maybe_revise_proposal_budget(conn, session_id: str, text: str, user_id: int
     flowers, cake = min(30_000, budget // 2), min(20_000, budget // 4)
     spare = max(budget - flowers - cake, 0)
     reply = (f"预算改为 {_money(budget)} 元。{target_text}是{who}的生日，建议这样安排：\n"
-             f"· 鲜花 {_money(flowers)} 元（生日前一天送到）\n"
+             f"· 鲜花 {_money(flowers)} 元（生日前 2 天送到）\n"
              f"· 蛋糕 {_money(cake)} 元（生日当天上午）\n"
              f"· 剩余 {_money(spare)} 元留作礼物备用（不自动下单）\n"
              f"我会在 {remind} 提醒你确认；确认后再锁定预算。按这个来吗？\n"
@@ -1014,7 +1021,7 @@ def _offer_plan_proposal(conn, session_id, trace_id, events, audit, intent, text
     flowers, cake = min(30_000, budget // 2), min(20_000, budget // 4)
     spare = max(budget - flowers - cake, 0)
     reply = (f"{target_text}是{who}的生日，预算 {_money(budget)} 元。我建议这样安排：\n"
-             f"· 鲜花 {_money(flowers)} 元（生日前一天送到）\n"
+             f"· 鲜花 {_money(flowers)} 元（生日前 2 天送到）\n"
              f"· 蛋糕 {_money(cake)} 元（生日当天上午）\n"
              f"· 剩余 {_money(spare)} 元留作礼物备用（不自动下单）\n"
              f"我会在 {remind} 提醒你确认；确认后再锁定预算。按这个来吗？\n"
@@ -1204,6 +1211,103 @@ def _maybe_modify_pending(conn, session_id: str, text: str):
         return None
     conn.execute("UPDATE pending_intents SET status='cancelled' WHERE id=?", (row["id"],))
     return handle_chat(conn, session_id, f"给{payee}转{m.group(1)}")
+
+def _maybe_annual_bill(conn, user_id: int, text: str):
+    if not (re.search(r"年度|全年|今年|2026\s*年", text) and re.search(r"账单|报告", text)):
+        return None
+    data = tools.call("get_bill_report", conn, user_id, {"range": "this_year"}).get("data") or {}
+    cats = "、".join(f"{x['category']} {_money(int(x['amount_cents']))} 元"
+                    for x in (data.get("by_category") or [])[:3])
+    return (f"{data.get('range_label', '今年')}账单：收入 {_money(int(data.get('income_cents') or 0))} 元，"
+            f"支出 {_money(int(data.get('total_cents') or 0))} 元，"
+            f"结余 {_money(int(data.get('savings_cents') or 0))} 元。"
+            + (f"前三类：{cats}。" if cats else ""))
+
+
+def _maybe_wealth_advice(conn, user_id: int, text: str):
+    t = text or ""
+    if not re.search(r"理财|基金|对比|比较", t):
+        return None
+    if re.search(r"买|申购|赎回|转入", t):
+        return None
+    if not re.search(r"推荐|对比|比较|哪个|有哪些|在售", t):
+        return None
+    data = tools.call("get_wealth_products", conn, user_id, {}).get("data") or {}
+    items = data.get("items") or []
+    if not items:
+        return "当前没有在售理财产品。"
+    picked = []
+    t_clean = t.replace(" ", "")
+    for item in items:
+        name = str(item.get("name") or "")
+        if name and name.replace(" ", "") in t_clean:
+            picked.append(item)
+    if "对比" in t and len(picked) >= 2:
+        lines = []
+        for item in picked[:3]:
+            lines.append(f"{item['name']}：{float(item.get('rate') or 0) * 100:.2f}% / "
+                         f"{item.get('term_days')} 天 / {item.get('risk_level')} / "
+                         f"起购 {_money(int(item.get('min_amount_cents') or 0))} 元")
+        return "对比：\n" + "\n".join(lines) + "\n（历史收益不代表未来，非保本。）"
+    lines = [f"{i + 1}. {item['name']}  {float(item.get('rate') or 0) * 100:.2f}%  "
+             f"{item.get('term_days')} 天  {item.get('risk_level')}  "
+             f"起购 {_money(int(item.get('min_amount_cents') or 0))} 元"
+             for i, item in enumerate(items[:4])]
+    return "在售理财产品（非保本，历史收益不代表未来）：\n" + "\n".join(lines)
+
+
+def _maybe_renewal_reminder(conn, user_id: int, text: str):
+    if not re.search(r"(下次|续费|扣费).{0,6}(提醒|通知)", text or ""):
+        return None
+    subs = [s for s in bankcore.list_subscriptions(conn, user_id) if s.get("status") == "active"]
+    subs = [s for s in subs if s.get("next_charge_at")]
+    if not subs:
+        return "当前没有可提醒的自动扣费项目。"
+    sub = sorted(subs, key=lambda s: str(s.get("next_charge_at")))[0]
+    next_at = str(sub["next_charge_at"])
+    try:
+        from datetime import date as _date, timedelta as _td
+        day = _date.fromisoformat(next_at[:10]) - _td(days=1)
+        at = f"{day.isoformat()}T09:00:00"
+    except ValueError:
+        at = next_at
+    content = f"{sub.get('merchant') or '自动扣费'} 下次扣费提醒"
+    res = tools.call("set_reminder", conn, user_id, {"at": at, "content": content})
+    if not res.get("ok"):
+        return "提醒设置失败，请稍后再试。"
+    try:
+        label = f"{day.month} 月 {day.day} 日"
+    except Exception:
+        label = at[:10]
+    return f"已设置 {label} 09:00 提醒：{content}（只提醒，不动资金）。"
+
+
+def _ground_payee_by_memo(conn, user_id: int, text: str, intent: dict) -> None:
+    """“给上次备注房租的那个人转100”：按交易备注/联系人反查收款人。"""
+    slots = intent.get("slots") if isinstance(intent.get("slots"), dict) else {}
+    t = text or ""
+    m = re.search(r"备注[为是]?\s*([\u4e00-\u9fa5A-Za-z0-9]{1,12}?)(?:的那个人|的|转|$)", t)
+    if not m:
+        return
+    keyword = m.group(1).removesuffix("的那个人").removesuffix("的").strip()
+    if not keyword:
+        return
+    row = conn.execute(
+        "SELECT counterparty FROM transactions WHERE user_id=? AND memo LIKE ? "
+        "ORDER BY id DESC LIMIT 1", (user_id, f"%{keyword}%")).fetchone()
+    name = str(row["counterparty"]) if row else ""
+    if not name and keyword == "房租":
+        name = "房东"
+    if not name:
+        return
+    rows = bankcore.find_contact(conn, user_id, name)
+    if len(rows) == 1:
+        slots["payee"] = rows[0]["name"]
+    else:
+        slots["payee"] = name
+    intent["slots"] = slots
+    intent["missing"] = [x for x in (intent.get("missing") or []) if x != "payee"]
+
 
 def _maybe_conditional_dag(conn, session_id: str, user_id: int, text: str):
     spec = conditional.parse(text)
@@ -1469,6 +1573,55 @@ def _red_reason(conn, user_id: int, plan: dict, level: dict, amount_text: str = 
     return str(level.get("reason") or "").rstrip("。")
 
 
+def _parse_scheduled_when(text: str) -> str | None:
+    """把“下个月1号/明天/下周五/11月15日”转成 ISO 时间（09:00）。"""
+    from datetime import date as _date, datetime as _dt, timedelta as _td
+    now = config.now_dt()
+    t = text or ""
+    day = None
+    m = re.search(r"下个月\s*(\d{1,2})?\s*[号日]?", t)
+    if m:
+        day = int(m.group(1) or 1)
+        year, month = now.year, now.month + 1
+        if month > 12:
+            year, month = year + 1, 1
+        try:
+            target = _date(year, month, day)
+        except ValueError:
+            return None
+    elif re.search(r"明天", t):
+        target = now.date() + _td(days=1)
+    elif re.search(r"后天", t):
+        target = now.date() + _td(days=2)
+    elif re.search(r"下周[一二三四五六日天]", t):
+        which = re.search(r"下周([一二三四五六日天])", t).group(1)
+        idx = "一二三四五六日天".index(which)
+        monday = now.date() - _td(days=now.weekday()) + _td(days=7)
+        target = monday + _td(days=idx)
+    elif re.search(r"每月\s*(\d{1,2})\s*[号日]", t):
+        day = int(re.search(r"每月\s*(\d{1,2})", t).group(1))
+        year, month = now.year, now.month
+        if day <= now.day:
+            month += 1
+            if month > 12:
+                year, month = year + 1, 1
+        try:
+            target = _date(year, month, day)
+        except ValueError:
+            return None
+    elif re.search(r"(\d{1,2})\s*月\s*(\d{1,2})\s*[号日]", t):
+        mm, dd = re.search(r"(\d{1,2})\s*月\s*(\d{1,2})", t).groups()
+        try:
+            target = _date(now.year, int(mm), int(dd))
+        except ValueError:
+            return None
+        if target < now.date():
+            target = target.replace(year=target.year + 1)
+    else:
+        return None
+    return _dt.combine(target, _dt.min.time()).replace(hour=9).isoformat()
+
+
 def handle_chat(conn, session_id: str, text: str, channel: str = "app",
                 user_id: int = config.DEFAULT_USER_ID, device_id: str | None = None,
                 act_as: str | None = None) -> dict:
@@ -1575,6 +1728,27 @@ def handle_chat(conn, session_id: str, text: str, channel: str = "app",
         early_conditional = _maybe_conditional_dag(conn, session_id, user_id, text)
         if early_conditional is not None:
             return early_conditional
+
+    annual = _maybe_annual_bill(conn, user_id, text)
+    if annual:
+        audit.append(trace_id, actor="agent", action="bill.annual", payload={"text": text[:40]},
+                     decision="answered")
+        _ev(events, "result", reply=annual, level="green", audit_url=f"/audit/{trace_id}")
+        return _finish(conn, trace_id, "done", events, annual, audit)
+
+    wealth_advice = _maybe_wealth_advice(conn, user_id, text)
+    if wealth_advice:
+        audit.append(trace_id, actor="agent", action="wealth.advice", payload={"text": text[:40]},
+                     decision="answered")
+        _ev(events, "result", reply=wealth_advice, level="green", audit_url=f"/audit/{trace_id}")
+        return _finish(conn, trace_id, "done", events, wealth_advice, audit)
+
+    renewal = _maybe_renewal_reminder(conn, user_id, text)
+    if renewal:
+        audit.append(trace_id, actor="agent", action="reminder.renewal", payload={"text": text[:40]},
+                     decision="answered" if "已设置" in renewal else "clarify")
+        _ev(events, "result", reply=renewal, level="green", audit_url=f"/audit/{trace_id}")
+        return _finish(conn, trace_id, "done", events, renewal, audit)
 
     simple_reply = _maybe_simple_query(conn, user_id, text)
     if simple_reply:
@@ -2019,6 +2193,14 @@ def handle_chat(conn, session_id: str, text: str, channel: str = "app",
             return _finish(conn, trace_id, "done", events, ask, audit)
 
     try:
+        if intent.get("name") == "transfer":
+            _ground_payee_by_memo(conn, user_id, text, intent)
+        if intent.get("name") == "scheduled_transfer" and not (intent.get("slots") or {}).get("run_at"):
+            when_text = str((intent.get("slots") or {}).get("when") or text)
+            run_at = _parse_scheduled_when(when_text)
+            if run_at:
+                intent.setdefault("slots", {})["run_at"] = run_at
+                intent["missing"] = [m for m in (intent.get("missing") or []) if m != "when"]
         if (intent.get("name") == "service"
                 and (intent.get("slots") or {}).get("action") == "reverse"
                 and not (intent.get("slots") or {}).get("txn_id")):
@@ -2078,8 +2260,21 @@ def handle_chat(conn, session_id: str, text: str, channel: str = "app",
 
     plan = _enrich_plan(conn, user_id, intent, plan, text)
 
+    if (intent.get("name") == "card"
+            and (intent.get("slots") or {}).get("action") == "limit"
+            and "new_limit" in (intent.get("missing") or [])):
+        reply = "要设置多少额度？比如「把这张卡的单笔限额设为 5000」。"
+        audit.append(trace_id, actor="agent", action="plan.clarify",
+                     payload={"goal": "card_limit"}, decision="need_more")
+        _ev(events, "result", reply=reply, level="green", audit_url=f"/audit/{trace_id}")
+        return _finish(conn, trace_id, "done", events, reply, audit)
+
     if not plan.get("nodes"):
-        if intent.get("name") == "transfer":
+        if (intent.get("name") == "card"
+                and (intent.get("slots") or {}).get("action") == "limit"
+                and "new_limit" in (intent.get("missing") or [])):
+            reply = "要设置多少额度？比如「把这张卡的单笔限额设为 5000」。"
+        elif intent.get("name") == "transfer":
             reply = "好的，转给谁、转多少？比如「转 500 给我妈」。"
         else:
             reply = plan.get("goal") or "还需要一点信息，能再说具体点吗？"
@@ -2440,6 +2635,8 @@ def _card_text(params: dict) -> str:
     action = params.get("action") or ""
     if action == "repay_credit_card":
         return "请确认本次信用卡还款："
+    if action == "schedule_transfer":
+        return "请确认预约转账："
     if action == "reverse_transfer":
         return "请确认撤销这笔转账："
     if action == "apply_virtual_card":
@@ -2721,6 +2918,10 @@ def _auto_facts(results: list[dict]) -> list[dict]:
 def _compose_reply(intent_name: str, res: dict, level: dict) -> str:
     by_tool = {r["tool"]: r["data"] for r in res["results"] if r["ok"]}
 
+    if "schedule_transfer" in by_tool:
+        d = by_tool["schedule_transfer"]
+        return (f"已预约向 {d.get('payee', '收款人')} 转账 {_money(d.get('amount_cents', 0))} 元，"
+                f"执行时间 {str(d.get('run_at', '')).replace('T', ' ')[:16]}；当前未扣款。")
     if "reverse_transfer" in by_tool:
         d = by_tool["reverse_transfer"]
         return (f"已撤销原转账，反向交易号 {d.get('reversal_txn_no', '')}，"

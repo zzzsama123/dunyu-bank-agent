@@ -49,7 +49,7 @@
 
 ```powershell
 cd backend
-python -m unittest discover tests -q      # 442 项
+python -m unittest discover tests -q      # 448 项
 python -m eval.runner                     # 243 条
 python -m eval.blind_runner               # 30 条盲测
 ```

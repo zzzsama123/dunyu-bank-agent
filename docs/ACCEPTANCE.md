@@ -16,7 +16,7 @@
 ## 复跑清单
 
 ```powershell
-# 1) 单元 + 集成（442 个：开发机 1 项跳过，便携版全通过）
+# 1) 单元 + 集成（448 个：开发机 1 项跳过，便携版全通过）
 cd bankagent\backend
 python -m unittest discover tests -v
 

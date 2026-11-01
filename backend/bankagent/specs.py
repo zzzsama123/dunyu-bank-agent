@@ -180,6 +180,13 @@ TOOL_SPECS: dict[str, dict] = {
         "desc": "申请密码重置链接（只发链接，不修改密码）",
         "params": {"channel": {"type": "str", "required": False}},
     },
+    "schedule_transfer": {
+        "group": "yellow", "flow": "none",
+        "desc": "预约未来转账",
+        "params": {"amount": {"type": "int", "required": True},
+                   "run_at": {"type": "str", "required": True},
+                   "contact_id": {"type": "int", "required": False}},
+    },
     "reverse_transfer": {
         "group": "red", "flow": "out",
         "desc": "撤销已执行转账",

@@ -36,6 +36,11 @@ CREATE TABLE IF NOT EXISTS contacts(
   id INTEGER PRIMARY KEY, user_id INTEGER, name TEXT, alias TEXT, phone TEXT,
   card_tail TEXT, is_new INTEGER DEFAULT 0, phone_full TEXT);
 
+CREATE TABLE IF NOT EXISTS scheduled_transfers(
+  id INTEGER PRIMARY KEY, user_id INTEGER, payee TEXT, contact_id INTEGER,
+  amount INTEGER, run_at TEXT, status TEXT DEFAULT 'scheduled', created_at TEXT,
+  txn_id INTEGER);
+
 CREATE TABLE IF NOT EXISTS points(
   user_id INTEGER PRIMARY KEY, balance INTEGER DEFAULT 0, expiring INTEGER DEFAULT 0,
   expire_at TEXT);
