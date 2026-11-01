@@ -3742,7 +3742,10 @@
     const merged = mergeConfirmParams(rawParams, deriveConfirmFields(turn, action));
     const params = merged.params;
     const level = normalizeLevel(card.level || data.level) || 'yellow';
-    const deadline = parseDateMs(data.expires_at || card.expires_at) || Date.now() + CONFIRM_TTL_MS;
+    const ttlSeconds = Number(data.expires_in || card.expires_in || 0);
+    const deadline = ttlSeconds > 0
+      ? Date.now() + ttlSeconds * 1000
+      : (parseDateMs(data.expires_at || card.expires_at) || Date.now() + CONFIRM_TTL_MS);
     const tokenFromEvent = String(
       data.token || data.confirm_token || card.confirm_token || card.token || ''
     );

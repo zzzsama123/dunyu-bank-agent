@@ -2350,12 +2350,14 @@ def handle_chat(conn, session_id: str, text: str, channel: str = "app",
         challenge = "ch_" + secrets.token_hex(4)
         stepup = {"challenge_id": challenge, "factors": ["sms", "face"],
                   "hint": f"演示验证码 {config.DEMO_STEPUP_CODE}",
-                  "expires_at": config.iso_after(STEPUP_TTL), "fails": 0,
+                  "expires_at": config.iso_after(STEPUP_TTL), "expires_in": STEPUP_TTL,
+                  "fails": 0,
                   "summary": summary or plan.get("goal", "")}
         intent_id = _save_pending(conn, session_id, user_id, plan, level, "awaiting_stepup",
                                   stepup=stepup, trace_id=trace_id)
         _ev(events, "stepup", challenge_id=challenge, factors=stepup["factors"], hint=stepup["hint"],
-            intent_id=intent_id, expires_at=stepup["expires_at"], summary=stepup["summary"])
+            intent_id=intent_id, expires_at=stepup["expires_at"], expires_in=STEPUP_TTL,
+            summary=stepup["summary"])
         audit.append(trace_id, actor="policy", action="stepup.issued",
                      payload={"challenge": challenge, "summary": stepup["summary"]},
                      decision="awaiting_stepup")
@@ -2376,10 +2378,11 @@ def handle_chat(conn, session_id: str, text: str, channel: str = "app",
     card["params"] = dict(params)          # 同时提供嵌套形状（契约 §9）与平铺字段，两种客户端都兼容
     card["params_hash"] = _hash_params(params)
     card["expires_at"] = config.iso_after(CONFIRM_TTL)
+    card["expires_in"] = CONFIRM_TTL
     card["intent_id"] = intent_id
     card["token"] = token
     _ev(events, "confirm", intent_id=intent_id, card=card, expires_at=card["expires_at"],
-        reason=level["reason"])
+        expires_in=CONFIRM_TTL, reason=level["reason"])
     audit.append(trace_id, actor="policy", action="confirm.issued",
                  payload={"intent_id": intent_id, "params_hash": card["params_hash"]},
                  decision="awaiting_confirm")
@@ -2438,7 +2441,7 @@ def handle_confirm(conn, session_id: str, intent_id: str, token: str,
         conn.execute("UPDATE pending_intents SET status='awaiting_stepup', stepup_json=? WHERE id=?",
                      (json.dumps(stepup, ensure_ascii=False), intent_id))
         _ev(events, "stepup", challenge_id=challenge, factors=stepup["factors"], hint=stepup["hint"],
-            intent_id=intent_id, expires_at=stepup["expires_at"])
+            intent_id=intent_id, expires_at=stepup["expires_at"], expires_in=STEPUP_TTL)
         return _finish(events=events, trace_id=trace_id, status="awaiting_stepup", conn=conn,
                        reply="请完成强验证后执行本次操作：回复 6 位验证码（演示 123456）。", audit=audit,
                        pending={"intent_id": intent_id, "challenge_id": challenge})
