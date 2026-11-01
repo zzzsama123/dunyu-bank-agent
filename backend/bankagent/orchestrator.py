@@ -660,7 +660,8 @@ def _maybe_wealth_query(conn, user_id: int, text: str) -> str | None:
         return None
     if re.search(r"(买|申购|转入|投)", t) and not re.search(r"(买的|买过|赚|收益|持仓)", t):
         return None
-    if not re.search(r"(收益|持仓|多少|查|看|有哪些|什么|情况|我的理财|赎回)", t):
+    if not re.search(r"(收益|持仓|多少|查|看|有哪些|什么|情况|我的理财|赎回)", t) \
+            and t.strip() not in ("理财", "理财呢", "我的理财"):
         return None
     if re.search(r"赎回", t) and not re.search(r"(持仓|第\s*\d|全部|所有)", t):
         holds = conn.execute(
@@ -1020,12 +1021,10 @@ def _offer_plan_proposal(conn, session_id, trace_id, events, audit, intent, text
     who = contact["name"] if contact else (payee or "TA")
     flowers, cake = min(30_000, budget // 2), min(20_000, budget // 4)
     spare = max(budget - flowers - cake, 0)
-    reply = (f"{target_text}是{who}的生日，预算 {_money(budget)} 元。我建议这样安排：\n"
-             f"· 鲜花 {_money(flowers)} 元（生日前 2 天送到）\n"
-             f"· 蛋糕 {_money(cake)} 元（生日当天上午）\n"
-             f"· 剩余 {_money(spare)} 元留作礼物备用（不自动下单）\n"
-             f"我会在 {remind} 提醒你确认；确认后再锁定预算。按这个来吗？\n"
-             f"计划预览（确认后执行）：① 查联系人 ② 读取生日档案 ③ 锁定预算 ④ 创建长期计划")
+    reply = (f"{target_text}是{who}的生日，预算 {_money(budget)} 元。我建议的生日准备："
+             f"鲜花 {_money(flowers)} 元（提前 2 天送）、蛋糕 {_money(cake)} 元（当天上午）、"
+             f"备用 {_money(spare)} 元（不自动下单）。\n"
+             f"我会提前 2 天提醒你确认；确认后再锁预算、建计划。按这个来吗？")
     entities = json.loads((bankcore.get_session(conn, session_id) or {}).get("recent_entities") or "{}")
     entities["proposal"] = {"kind": kind, "payee": who, "budget": budget}
     bankcore.update_session(conn, session_id, recent_entities=entities)
@@ -1285,6 +1284,9 @@ def _maybe_renewal_reminder(conn, user_id: int, text: str):
 def _ground_payee_by_memo(conn, user_id: int, text: str, intent: dict) -> None:
     """“给上次备注房租的那个人转100”：按交易备注/联系人反查收款人。"""
     slots = intent.get("slots") if isinstance(intent.get("slots"), dict) else {}
+    payee = str(slots.get("payee") or "")
+    if payee and "备注" not in payee:
+        return  # 已明确收款人（如“转100给张三”），备注不得劫持
     t = text or ""
     m = re.search(r"备注[为是]?\s*([\u4e00-\u9fa5A-Za-z0-9]{1,12}?)(?:的那个人|的|转|$)", t)
     if not m:
@@ -1622,9 +1624,16 @@ def _parse_scheduled_when(text: str) -> str | None:
     return _dt.combine(target, _dt.min.time()).replace(hour=9).isoformat()
 
 
+def _strip_trailing_note(text: str) -> str:
+    """剥离 UI 转账表单追加的「，备注X」，备注不参与意图/收款人解析。"""
+    return re.sub(r"[，,]\s*备注\s*[:：]?.*$", "", text or "").strip()
+
+
 def handle_chat(conn, session_id: str, text: str, channel: str = "app",
                 user_id: int = config.DEFAULT_USER_ID, device_id: str | None = None,
                 act_as: str | None = None) -> dict:
+    raw_text = text or ""
+    text = _strip_trailing_note(lexicon.canonicalize(raw_text))
     trace_id = "tr_" + secrets.token_hex(4)
     events: list = []
     audit = trust.AuditLog(conn)
@@ -1691,7 +1700,8 @@ def handle_chat(conn, session_id: str, text: str, channel: str = "app",
     ).fetchone()
     short = re.sub(r"\s+", "", text or "")
     if pending_row and pending_row["status"] == "awaiting_confirm" and short in (
-            "确认", "确定", "确认执行", "同意", "可以", "办吧"):
+            "确认", "确定", "确认执行", "同意", "可以", "好", "行", "没问题",
+            "就按这个来", "按这个来", "就这样", "办吧"):
         return handle_confirm(conn, session_id, pending_row["id"], pending_row["token"], user_id)
     if pending_row and pending_row["status"] == "awaiting_stepup" and short in ("确认", "确定", "继续"):
         return _finish(conn, trace_id, "awaiting_stepup", events,
@@ -1858,10 +1868,21 @@ def handle_chat(conn, session_id: str, text: str, channel: str = "app",
         dialogue.match(text) == "affirm"
         or text.strip() in short_yes
         or any(w in text for w in affirm_words))
+    if proposal and text.strip() in ("1", "2"):
+        if text.strip() == "2":
+            entities.pop("proposal", None)
+            bankcore.update_session(conn, session_id, recent_entities=entities)
+            reply = "好，那这次不办了；需要别的随时说。"
+            audit.append(trace_id, actor="user", action="proposal.cancelled",
+                         payload={"text": text}, decision="cancelled")
+            _ev(events, "result", reply=reply, level="green", audit_url=f"/audit/{trace_id}")
+            return _finish(conn, trace_id, "done", events, reply, audit)
+        from_proposal = True
     if from_proposal:
         entities.pop("proposal", None)
         bankcore.update_session(conn, session_id, recent_entities=entities)
-    elif proposal and len(text.strip()) <= 4 and not re.search(r"\d", text):
+    elif (proposal and len(text.strip()) <= 4 and not re.search(r"\d", text)
+          and not re.search(r"(查|余额|卡|密码|还|贷|转|账|流水|提醒|取消|挂失|额度|理财|订阅)", text)):
         # 方案还挂着、用户只回了两三个字（"来""好呀""冲"）→ 先确认，别让模型自由发挥
         tips = "；".join(f"{k} {v}" for k, v in [
             ("要按这个方案来吗？", "说「可以」或「算了」即可"),

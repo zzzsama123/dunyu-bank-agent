@@ -197,6 +197,9 @@ class Handler(BaseHTTPRequestHandler):
                 rng = (params.get("range") or ["this_month"])[0]
                 party = (params.get("counterparty") or [""])[0].strip()
                 start, rows = _export_rows(rng, party)
+                if not rows:
+                    return _json(self, {"code": "E_EMPTY_EXPORT",
+                                        "message": "该筛选条件下没有流水，未生成空文件。"}, 404)
                 data = xlsx.build(
                     _EXPORT_HEADERS,
                     _export_matrix(rows),
@@ -217,6 +220,9 @@ class Handler(BaseHTTPRequestHandler):
                 rng = (params.get("range") or ["this_month"])[0]
                 party = (params.get("counterparty") or [""])[0].strip()
                 start, rows = _export_rows(rng, party)
+                if not rows:
+                    return _json(self, {"code": "E_EMPTY_EXPORT",
+                                        "message": "该筛选条件下没有流水，未生成空文件。"}, 404)
                 output = io.StringIO()
                 writer = csv.writer(output)
                 writer.writerow(["日期", "类型", "方向", "金额(元)", "对手方", "分类", "备注", "单号"])

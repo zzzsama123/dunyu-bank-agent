@@ -224,7 +224,7 @@ def _latest(conn, user_id: int) -> str:
         return "还没有交易记录。"
     t = rows[0]
     direction = "收入" if t.get("direction") == "in" else "支出"
-    return (f"最近一笔：{str(t.get('created_at'))[:10]} {t.get('counterparty') or ''} "
+    return (f"账户最近一笔（含历史）：{str(t.get('created_at'))[:10]} {t.get('counterparty') or ''} "
             f"{direction} {_money(int(t.get('amount_cents') or 0))} 元，"
             f"状态 {'成功' if t.get('status') == 'succeeded' else t.get('status')}。"
             f"需要看完整决策链，点结果卡下方的「查看审计」。")
