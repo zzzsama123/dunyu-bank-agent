@@ -1,4 +1,9 @@
-# GitHub 上传说明
+# GitHub 仓库（已上传）
+
+仓库地址：https://github.com/zzzsama123/dunyu-bank-agent
+
+本地 main 已推送。
+
 
 本机没有配置 GitHub 账号/远程仓库，所以**没有伪造公开地址**。源码已在本地初始化 git，按下面步骤上传后，把真实地址替换到 `作品信息.md`。
 
