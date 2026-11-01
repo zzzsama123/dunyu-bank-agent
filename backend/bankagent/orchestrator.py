@@ -3161,7 +3161,9 @@ def get_state(conn, session_id: str) -> dict:
     ).fetchone()
     pending = None
     if row:
+        card = json.loads(row["card_json"] or "{}")
+        ttl = CONFIRM_TTL if row["status"] == "awaiting_confirm" else STEPUP_TTL
+        card.setdefault("expires_in", ttl)
         pending = {"intent_id": row["id"], "status": row["status"],
-                   "card": json.loads(row["card_json"] or "{}"),
-                   "expires_at": row["expires_at"]}
+                   "card": card, "expires_at": row["expires_at"], "expires_in": ttl}
     return {"state": (session or {}).get("state", "NORMAL"), "pending": pending}
