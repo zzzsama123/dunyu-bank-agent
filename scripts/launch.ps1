@@ -38,6 +38,25 @@ function Test-Port([int]$p) {
     }
 }
 
+function Test-OurApp([int]$p) {
+    try {
+        $h = Invoke-RestMethod "http://127.0.0.1:$p/health" -TimeoutSec 2
+        return [bool]($h.ok -and $h.version)
+    } catch {
+        return $false
+    }
+}
+
+# 已经有盾语在跑：直接打开浏览器，不再起第二个端口
+for ($p = 8000; $p -lt 8020; $p++) {
+    if (Test-OurApp $p) {
+        Write-Host ""
+        Write-Host "  盾语已经在运行：http://127.0.0.1:$p" -ForegroundColor Cyan
+        Write-Host "  已为你打开浏览器；关闭原来的启动窗口才会停止服务。" -ForegroundColor DarkGray
+        if ($env:BANK_OPEN_BROWSER -ne "0") { Start-Process "http://127.0.0.1:$p" }
+        exit 0
+    }
+}
 $port = if ($env:BANK_PORT) { [int]$env:BANK_PORT } else { 8000 }
 for ($i = 0; $i -lt 20; $i++) {
     if (-not (Test-Port $port)) { break }

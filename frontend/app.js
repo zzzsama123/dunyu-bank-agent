@@ -923,7 +923,18 @@
    * 6. 连接与会话状态
    * ============================================================ */
 
+  let healthRetryTimer = null;
+  function scheduleHealthRetry() {
+    if (healthRetryTimer) return;
+    healthRetryTimer = window.setTimeout(async () => {
+      healthRetryTimer = null;
+      const ok = await checkHealth();
+      if (!ok) scheduleHealthRetry();
+    }, 3000);
+  }
+
   function markServiceOnline(version, brain) {
+    if (healthRetryTimer) { window.clearTimeout(healthRetryTimer); healthRetryTimer = null; }
     state.connected = true;
     state.healthChecked = true;
     if (dom.connDot) {
@@ -970,6 +981,7 @@
         ? '请求超时。请确认后端已启动，或稍后点击重试。'
         : '无法连接银行服务。请确认后端已启动，界面可继续浏览。'
     );
+    scheduleHealthRetry();
   }
 
   async function checkHealth(options) {
@@ -982,6 +994,7 @@
       markServiceOffline();
       showConnectionBanner('银行服务暂时无法连接', describeError(err));
       if (opts.notify) showToast('仍无法连接银行服务，请检查后端是否已启动。', 'error');
+      scheduleHealthRetry();
       return false;
     }
   }
