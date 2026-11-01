@@ -2,6 +2,19 @@
 
 > GitHub：https://github.com/zzzsama123/dunyu-bank-agent
 
+## 评委如何运行（重要）
+
+**GitHub 是源码仓库，不含 Python 运行时、Vosk 语音模型、BGE 语义模型，不能直接双击 start.bat。**
+
+请到 Releases 下载免安装包：
+
+https://github.com/zzzsama123/dunyu-bank-agent/releases/tag/v1.0-demo
+
+解压后进入 portable/（或直接解压便携包），双击 start.bat；不需要装 Python、不需要联网、不需要 Key。
+
+源码开发/二次运行：安装 Python 3.12 后设置 BANK_SOURCE_RUN=1，再执行 scripts/launch.ps1。
+
+
 > 深圳大学 × 微众银行 · 人工智能赛道 01「银行 AI 智能体」参赛作品（Demo）
 > **完全仿真**：所有账户、流水、卡、理财、用户信息均为程序生成的合成数据，不连接任何真实银行系统，不处理真实资金。
 

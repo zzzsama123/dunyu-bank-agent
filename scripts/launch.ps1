@@ -3,14 +3,24 @@ $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $PSScriptRoot
 $py = Join-Path $root "runtime\python\python.exe"
 
-if (Test-Path $py) {
+if (-not (Test-Path $py)) {
+    Write-Host ""
+    Write-Host "  这是盾语的源码仓库，不是免安装运行包。" -ForegroundColor Yellow
+    Write-Host "  仓库不包含 Python 运行时、Vosk 语音模型和 BGE 语义模型，不能直接双击运行。" -ForegroundColor Yellow
+    Write-Host ""
+    Write-Host "  评委请下载 Release 便携包：" -ForegroundColor Cyan
+    Write-Host "  https://github.com/zzzsama123/dunyu-bank-agent/releases/tag/v1.0-demo" -ForegroundColor Cyan
+    Write-Host "  解压后双击 start.bat 即可。" -ForegroundColor DarkGray
+    Write-Host ""
+    if ($env:BANK_SOURCE_RUN -ne "1") { exit 1 }
+    $py = "python"
+}
+
+if ($py -ne "python") {
     $model = Join-Path $root "runtime\asr\model"
     if (Test-Path (Join-Path $model "am\final.mdl")) { $env:VOSK_MODEL = $model }
-    if (-not $env:BANK_OPEN_BROWSER) { $env:BANK_OPEN_BROWSER = "1" }
-} else {
-    $py = "python"
-    if (-not $env:BANK_OPEN_BROWSER) { $env:BANK_OPEN_BROWSER = "1" }
 }
+if (-not $env:BANK_OPEN_BROWSER) { $env:BANK_OPEN_BROWSER = "1" }
 
 $backend = Join-Path $root "backend"
 Set-Location $backend
