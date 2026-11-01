@@ -8,7 +8,7 @@
   <meta name="description" content="盾语（仿真环境）：一句话办理账单分析、订阅管理、转账与长期计划。权限分级、策略裁决、全链路哈希链审计。">
   <title>盾语 · 银行 AI 智能体（仿真环境）</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'%3E%3Crect width='44' height='44' rx='12' fill='%230d2b4e'/%3E%3Cpath d='M22 8.5l10.5 4.2v6.4c0 6.6-4.4 11.2-10.5 13.7C15.9 30.3 11.5 25.7 11.5 19.1v-6.4L22 8.5z' fill='none' stroke='%23e6c98b' stroke-width='1.6'/%3E%3Cpath d='M16.3 17.2h11.4M17.2 19.7h9.6M18.2 22.2h7.6M19.2 24.7h5.6M22 13.8v2.2' stroke='%23e6c98b' stroke-width='1.2'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="./styles.css?v=20261101c">
+  <link rel="stylesheet" href="./styles.css?v=20261101d">
 </head>
 <body>
   <a class="skip-link" href="#composer-input">跳到消息输入框</a>
@@ -456,8 +456,6 @@
                 <option value="llm">大模型模式（需配置 Key）</option>
               </select>
             </div>
-          </section>
-
             <div class="setting-row">
               <div class="setting-copy"><strong>API Key</strong><span id="llm-key-note">Key 只保存在本机，不回显、不写入审计</span></div>
             </div>
@@ -467,6 +465,7 @@
               <button type="button" class="settings-secondary" id="llm-key-clear">清除</button>
             </div>
             <p class="setting-note">保存后立即切换到大模型模式；调用失败会自动回退规则，安全边界不变。Key 仅用于本机请求，不会下发到前端。</p>
+          </section>
 
           <section class="settings-panel" data-panel="voice" hidden>
             <h2>语音</h2>
@@ -638,6 +637,6 @@
     <div class="noscript-note">本演示需要启用 JavaScript 才能连接 AI 智能体。</div>
   </noscript>
 
-  <script src="./app.js?v=20261101c"></script>
+  <script src="./app.js?v=20261101d"></script>
 </body>
 </html>
