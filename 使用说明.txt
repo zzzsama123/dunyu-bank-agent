@@ -1,8 +1,16 @@
 ﻿银行 AI 智能体（仿真演示）· 使用说明
 ========================================
 
-一、怎么打开
-------------
+【先确认你拿到的是哪种】
+- 便携包（有 runtime 目录）：按下面“便携包”步骤，双击 start.bat 即可。
+- 源码/GitHub（只有 backend/frontend/docs，没有 runtime）：不能直接双击 start.bat。
+  评委请下载 Release 便携包：
+  https://github.com/zzzsama123/dunyu-bank-agent/releases/tag/v1.0-demo
+  开发者运行：安装 Python 3.12，进入 backend，执行 python -m bankagent.api；
+  语音/语义模型需按 scripts/setup_asr.ps1 准备，源码仓库不含模型。
+
+一、怎么打开（便携包）
+--------------------
 1. 解压整个压缩包到任意目录（路径含中文也可以）；
 2. 双击 start.bat（或 启动.bat）；
 3. 等待 20–40 秒，浏览器会自动打开（默认 http://127.0.0.1:8000；端口被占用会自动顺延，以窗口提示为准）
