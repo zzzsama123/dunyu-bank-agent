@@ -33,7 +33,7 @@
 
 | 指标 | 结果 | 来源 |
 |---|---|---|
-| 单元/集成测试 | 448 项（开发机 441 通过 / 1 跳过；便携版 448 全通过） | `unittest discover tests` |
+| 单元/集成测试 | 448 项（最终便携版 448 全通过；开发机 447 通过 / 1 条环境相关跳过） | `unittest discover tests` |
 | 评测集 | 243 / 243 | `eval/report.json` |
 | 盲测集 | 27 / 30 | `docs/BLIND_TEST.md` |
 | 红队（端到端） | 58 / 58 | `eval/cases/redteam.json` |

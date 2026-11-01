@@ -120,7 +120,8 @@ narration = {}
 s = prs.slides.add_slide(BLANK)
 bg(s, NAVY)
 rect(s, 0, 0, 0.14, 7.5, GOLD, radius=False)
-text(s, 0.95, 0.65, 5.0, 0.3, "DUNYU · 银行 AI 智能体", 11, GOLD, True)
+text(s, 0.95, 0.55, 10.8, 0.3, "Prometheus Ultra｜普罗米修斯 · 极致", 11, GOLD, True)
+text(s, 0.95, 0.92, 6.0, 0.25, "DUNYU · 盾语 · 银行 AI 智能体", 9, RGBColor(0xC9, 0xD3, 0xDD))
 text(s, 0.95, 1.55, 9.4, 1.1, "盾语", 66, WHITE, True)
 text(s, 0.98, 2.75, 10.5, 0.55, "银行 AI 智能体 · 仿真环境", 25, GOLD)
 text(s, 0.98, 3.6, 8.6, 0.5, "听得懂，也守得住。", 24, RGBColor(0xDD, 0xE6, 0xEF))
@@ -239,8 +240,8 @@ s = prs.slides.add_slide(BLANK)
 title(s, "POLICY · 权限", "三级权限：模型没有执行权", 6)
 cols = [
     ("绿 · 只读", "余额 / 流水 / 账单 / 持仓\n知识咨询 / 主动提醒", "直接执行", GREEN),
-    ("黄 · 小额办理", "≤5,000 转账 / 退订 / 调额\n风险测评 / 虚拟卡", "确认卡：金额/对象/后果", AMBER),
-    ("红 · 大额/不可逆", ">5,000 转账 / 挂失 / 赎回\n还款 / 密码重置", "确认卡 → 强验证", RED),
+    ("黄 · 小额办理", "日累计 ≤1,000 转账\n新收款人 ≤500 / 退订 / 调额", "确认卡：金额/对象/后果", AMBER),
+    ("红 · 大额/不可逆", "日累计 >1,000 转账\n新收款人 >500 / 挂失 / 赎回 / 还款", "确认卡 → 强验证", RED),
 ]
 for i, (h, body, action, color) in enumerate(cols):
     x = 0.8 + i * 4.05
@@ -251,8 +252,9 @@ for i, (h, body, action, color) in enumerate(cols):
 rect(s, 0.8, 4.85, 11.7, 1.25, RGBColor(0xEF, 0xE8, 0xDA))
 text(s, 1.05, 4.98, 11.2, 0.3, "确认卡绑定：token · intent_id · params_hash · 过期时间 · 一次性", 13, GOLD_DARK, True)
 text(s, 1.05, 5.38, 11.2, 0.55, "改金额 → E_PARAM；改 token → E_CONFIRM_TOKEN；执行前重新跑策略；审计链可校验。", 11, INK)
-notes(s, "三级权限。绿色只读直答；黄色写操作必须先看确认卡；红色还要强验证。确认卡不是一张图片，token、intent_id、params_hash 三者绑定，改一个就失效。")
-narration["6"] = "三级权限。绿色只读直答；黄色写操作必须先看确认卡；红色还要强验证。确认卡不是一张图片，token、intent_id、params_hash 三者绑定，改一个就失效。"
+text(s, 0.8, 6.3, 11.7, 0.35, "硬上限：单笔/计划 50,000 元，超出直接拒绝；IM 300 元、夜间 500 元另计。", 9, MUTED)
+notes(s, "三级权限。绿色只读直答；黄色转账按日累计 1000 元、新收款人单笔 500 元以内；红色是超过日累计 1000 或新收款人 500，以及挂失、赎回、还款等。单笔和计划硬上限都是 5 万，超出直接拒绝。确认卡 token、intent_id、params_hash 三者绑定，改一个就失效。")
+narration["6"] = "三级权限。绿色只读直答；黄色转账按日累计 1000 元、新收款人单笔 500 元以内；红色是超过日累计 1000 或新收款人 500，以及挂失、赎回、还款等。单笔和计划硬上限都是 5 万，超出直接拒绝。确认卡 token、intent_id、params_hash 三者绑定，改一个就失效。"
 
 # 7 Security
 s = prs.slides.add_slide(BLANK)
@@ -363,7 +365,8 @@ narration["12"] = "边界也要讲。已经做到的和没做到的都列出来�
 s = prs.slides.add_slide(BLANK)
 bg(s, NAVY)
 rect(s, 0, 0, 0.14, 7.5, GOLD, radius=False)
-text(s, 0.95, 1.35, 10.8, 0.4, "DUNYU · 银行 AI 智能体（仿真环境）", 11, GOLD, True)
+text(s, 0.95, 1.1, 10.8, 0.35, "Prometheus Ultra｜普罗米修斯 · 极致", 11, GOLD, True)
+text(s, 0.95, 1.45, 10.8, 0.3, "DUNYU · 盾语 · 银行 AI 智能体（仿真环境）", 9, RGBColor(0xC9, 0xD3, 0xDD))
 text(s, 0.95, 2.0, 10.8, 0.9, "听得懂，也守得住。", 44, WHITE, True)
 text(s, 0.98, 3.2, 10.8, 0.45, "理解与授权分离 · 条件 DAG · 策略裁决 · 哈希链审计", 17, RGBColor(0xD3, 0xDF, 0xEA))
 rect(s, 0.98, 4.2, 11.2, 1.05, RGBColor(0x16, 0x3B, 0x62), RGBColor(0x3A, 0x5C, 0x7B))
